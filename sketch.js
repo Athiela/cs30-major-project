@@ -1,9 +1,6 @@
-// Project Title
-// Your Name
+// Adventure visual novel
+// Athiela A. 
 // Date
-//
-// Extra for Experts:
-// - describe what you did to take this project "above and beyond"
 
 
 function setup() {
