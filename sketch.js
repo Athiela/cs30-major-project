@@ -7,14 +7,21 @@
 // ---------------- General Game variables --------------------------------//
 
 let state = "start";
+let font;
 
 // ------------------ Start Game variables --------------------------------//
 
 let gameTitle;
 let playButton, hoverPlayButton, thePlayButton;
 
-// TEMPORARY FOR TESTING
+// --------------------- Text Box variables --------------------------------//
+
+// text box variables
+let emptyText, textState;
 let text1, theText;
+
+// scene 1 text
+let sceneOneText1, sceneOneText2, sceneOneText3;
 
 // -------------------- Escape Room Minigame ----------------------------- //
 
@@ -61,35 +68,19 @@ let playButtonHover = false;
 let howToPlayButtonHover = false;
 let HowPlayMenu = false;
 
-////////////////// Setup //////////////////////////////////////
-function setup() {
-  createCanvas(800, 800);
-  rockPaperScissorsVariables();
-
-  thePlayButton = new Button(width/3.5, height/2, playButton, hoverPlayButton, "scene1-text");
-  
-  theMenu = new Button(100, 100, menuButton, menuButton, "menu");
-  theExitButton = new Button (width/3.5, height/2, exitButton, hoverExit, "test");
-  
-  theText = new Text(width/7, height/4, text1);
-}
-
-function draw() {
-  background(25);
-  gameState();
-}
-
-//////////// Load Images //////////////////////////
+///////////////////////// Load Images //////////////////////////
 
 function preload() {
+  // ----------------- Font/Text Preload ---------------- //
+
+  emptyText = loadImage("assets/empty-textbox.png");
+  font = loadFont("assets/font.ttf");
+
   // ------------------ Start Preload ------------------ //
 
   gameTitle = loadImage("assets/gameTitle.png");
   playButton = loadImage("assets/playButton.png");
   hoverPlayButton = loadImage("assets/hoverPlayButton.png");
-
-  // TEMPRARY PRELOAD FOR TESTING
-  text1 = loadImage("assets/text-temp.png");
 
   //------------------- Menu Preload ------------------- //
 
@@ -100,6 +91,7 @@ function preload() {
   //----------- Escape Room Minigame Preload -----------//
 
   //----------- Rock Paper Scissors Minigame Preload -----------//
+
   // rpsStartTitle = loadImage("assets/startTitle.png");
   // title = loadImage("assets/title.png");
   // howToPlayMenu = loadImage("assets/howPlayMenu.png");
@@ -131,6 +123,19 @@ function preload() {
   // youChoseScissors = loadImage("assets/youChoseScissors.png");
   // pressEsc = loadImage("assets/pressEscExit.png");
 }
+////////////////// Setup //////////////////////////////////////
+
+function setup() {
+  createCanvas(800, 800);
+  rockPaperScissorsVariables();
+  createObject();
+}
+
+function draw() {
+  background(25);
+  gameState();
+}
+
 
 /////////////////// Variable defining for start menu  //////////////////////////
 
@@ -160,29 +165,107 @@ function rockPaperScissorsVariables() {
 
   playButtonWidth = width/4;
   howToPlayButtonWidth = width/4;
-
+  
   playButtonHeight = height/5;
   howToPlayButtonHeight = height/5;
-
+  
   xExitMenu = width/20;
   yExitMenu = height/12;
   exitMenuWidth = width/15;
   exitMenuHeight = height/10;
-
-  xExitButton = width/2;
-  yExitButton = height/2;
-  exitButtonWidth = width/4;
-  exitButtonHeight = height/5;
-
+  
   xKeybind = width/2;
   yKeybind = height/1.3;
   keybindWidth = width/4;
   keybindHeight = height/5;
-
+  
   xMenu = width/20;   
   yMenu = height/12;
   menuWidth = width/15;
   menuHeight = height/10;
+}
+
+// ----------------- OBJECTS ----------------------------- //
+
+class Button {
+  constructor(x, y, w, h, theImage, theHoverImage, changeState) {
+    this.x = x;
+    this.y = y;
+    this.width = w;
+    this.height = h;
+    this.theImage = theImage;
+    this.theHoverImage = theHoverImage;
+    this.changeState = changeState;
+  }
+  hoverClick() {
+    if (this.checkIfInside(mouseX, mouseY)) {
+      image(this.theHoverImage, this.x, this.y, this.width, this.height);
+      if (mouseIsPressed) {
+        state = this.changeState;
+      }
+    }
+    else {
+      image(this.theImage, this.x, this.y, this.width, this.height);
+    }
+  }
+  checkIfInside(x, y) {
+    return x>this.x && x<this.x + this.width &&
+    y>this.y && y<this.y + this.height;
+  }
+}
+
+class Text {
+  constructor(x, y, theImage, whatTextDisplay, whatTextChange) {
+    this.x = x;
+    this.y = y;
+    this.image = theImage;
+    this.w = width/1.15;
+    this.h = height/2.2;
+    this.textX = x+50;
+    this.textY = y+70;
+    this.color = "#dbd4d4";
+    this.font = font;
+    this.textSize = 23;
+    this.text = whatTextDisplay;
+    this.textState = whatTextChange;
+  }
+  display() {
+    image(this.image, this.x, this.y, this.w, this.h);
+    fill(this.color);
+    textFont(this.font);
+    textSize(this.textSize);
+    text(this.text, this.textX, this.textY);
+  }
+  mouseClicked() {
+    textState = this.textState;
+  }
+}
+
+// -------------------- OBJECT CREATION --------------------- //
+
+function createObject() {
+  thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene1-text");
+    
+  theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "menu");
+  theExitButton = new Button (width/3.5, height/2, exitButton, hoverExit, "test");
+  
+  sceneOneText1 = new Text(width/15, height/2, emptyText, "Test 1");
+  sceneOneText2 = new Text(width/15, height/2.5, emptyText, "Test 2");
+  sceneOneText3 = new Text(width/15, height/2.5, emptyText, "Test 3");
+}
+
+// ----------------------- TEXT STATE ---------------------- //
+
+function theTextState() {
+  if (textState === "scene-one-1") {
+    sceneOneText1.display();
+  }
+  else if (textState === "scene-one-2") {
+    sceneOneText2.display();
+  }
+  if (textState === "scene-one-3") {
+    sceneOneText3.display();
+  }
 }
 
 /////////////// Game State //////////////////////////////
@@ -202,7 +285,7 @@ function gameState() {
     background(80);
   }
   else if (state === "scene1-text") {
-    theText.display();
+    sceneOneText1.display();
     theMenu.hoverClick();
   }
   // --- Rock Paper Scissors Minigame Gamestate --- // 
@@ -242,12 +325,8 @@ function gameState() {
     pressMenu();
   }
   else if (state === "rps-menu") {
-    displayExitButton();
-    displayHoverExitButton();
     displayKeybindButton();
     displayHoverKeybindButton();
-    
-    hoverMenuButtons();
     displayStartTitle();
   }
   else if (state === "rps-areYouSureExit") {
@@ -295,55 +374,6 @@ function gameState() {
     restoreCardPos();
   }
 }
-
-// --------------------------------------------------- //
-// ------------- OBJECTS ----------------------------- //
-// --------------------------------------------------- //
-
-class Button {
-  constructor(x, y, theImage, theHoverImage, changeState) {
-    this.x = x;
-    this.y = y;
-    this.width = 350;
-    this.height = 150;
-    this.theImage = theImage;
-    this.theHoverImage = theHoverImage;
-    this.changeState = changeState;
-  }
-  hoverClick() {
-    if (this.checkIfInside(mouseX, mouseY)) {
-      image(this.theHoverImage, this.x, this.y, this.width, this.height);
-      if (mouseIsPressed) {
-        state = this.changeState;
-      }
-    }
-    else {
-      image(this.theImage, this.x, this.y, this.width, this.height);
-    }
-  }
-  checkIfInside(x, y) {
-    return x>this.x && x<this.x + this.width &&
-    y>this.y && y<this.y + this.height;
-  }
-}
-
-class Text {
-  constructor(x, y, theImage) {
-    this.x = x;
-    this.y = y;
-    this.image = theImage;
-    this.w = width/1.4;
-    this.h = height/2.2;
-  }
-  display() {
-    image(this.image, this.x, this.y, this.w, this.h);
-  }
-}
-
-// --------------------------------------------------- //
-// ----------- START MENU ---------------------------- //
-// --------------------------------------------------- //
-
 
 ////////// Display image functions /////////////////
 
@@ -407,15 +437,6 @@ function displayHoverHowToPlay() {
 function displayMenuButton() {
   image(menuButton, xMenu, yMenu, menuWidth, menuHeight);
 }
-
-function displayExitButton() {
-  image(exitButton, xExitButton, yExitButton, exitButtonWidth, exitButtonHeight);
-}
-
-function displayHoverExitButton() {
-  image(hoverExit, xExitButton, yExitButton, exitButtonWidth, exitButtonHeight);
-}
-
 function displayKeybindButton() {
   image(keybind, xKeybind, yKeybind, keybindWidth, keybindHeight);
 }
@@ -462,23 +483,6 @@ function displayYouLose() {
 
 function displayPressEsc() {
   image(pressEsc, width /2, height /2, width/3, height/3);
-}
-
-///////////// Game = Play Functions /////////////////////
-
-function hoverMenuButtons() {
-  if (mouseX > xExitButton - exitButtonWidth/2 && mouseX < xExitButton + exitButtonWidth/2 && mouseY > yExitButton - exitButtonHeight/2 && mouseY < yExitButton + exitButtonHeight/2) {
-    displayHoverExitButton();
-  }
-  else {
-    displayExitButton();
-  }
-  if (mouseX > xKeybind - keybindWidth/2 && mouseX < xKeybind + keybindWidth/2 && mouseY > yKeybind - keybindHeight/2 && mouseY < yKeybind + keybindHeight/2) {
-    displayHoverKeybindButton();
-  }
-  else {
-    displayKeybindButton();
-  }
 }
 
 ////////////// Chose card/Change functions ////////////////////
