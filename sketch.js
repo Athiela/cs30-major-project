@@ -31,7 +31,7 @@ let spriteFront, spriteback, spriteLeft, spriteRight;
 // -------------------- Rock Paper Scissors Minigame --------------------- //
 
 // card variables
-let cardR, cardP, cardS, xCardRock, yCardRock, xCardPaper, yCardPaper, xCardScissors, yCardScissors, cardWidth, cardHeight, cardFrame;
+let cardRock, theCardRock, cardPaper, theCardPaper, cardScissors, theCardScissors, cardFrame;
 
 // play button variables
 let playButtonWidth, howToPlayButtonWidth, playButtonHeight, howToPlayButtonHeight, xHowToPlayButton, yHowToPlayButton, xPlayButton, yPlayButton, howToPlayButton, hoverHowToPlay, hoverPlay;
@@ -97,11 +97,11 @@ function preload() {
   // howToPlayMenu = loadImage("assets/howPlayMenu.png");
   // exitMenu = loadImage("assets/exitMenuButton.png");
   
-  // cardR = loadImage("assets/cardRock.png");
-  // cardP = loadImage("assets/cardPaper.png");
-  // cardS = loadImage("assets/cardScissors.png");
+  cardRock = loadImage("assets/cardRock.png");
+  cardPaper = loadImage("assets/cardPaper.png");
+  cardScissors = loadImage("assets/cardScissors.png");
 
-  // cardFrame = loadImage("assets/cardFrame.png");
+  cardFrame = loadImage("assets/cardFrame.png");
   
   // playButton = loadImage("assets/playButton.png");
   // howToPlayButton = loadImage("assets/howToPlayButton.png");
@@ -146,26 +146,6 @@ function startMenuVariables() {
 /////////////////// Variable defining for rock paper scissors  //////////////////////////
 
 function rockPaperScissorsVariables() {
-  xCardRock = width/4;
-  yCardRock = height/2;
-  
-  xCardPaper = width/2;
-  yCardPaper = height/2;
-  
-  xCardScissors = width/1.3;
-  yCardScissors = height/2;
-  cardWidth = width/6;
-  cardHeight = height/2.2;
-
-  xHowToPlayButton = width/2;
-  yHowToPlayButton = height/1.3;
-
-  xPlayButton = width/2;
-  yPlayButton = height/2;
-
-  playButtonWidth = width/4;
-  howToPlayButtonWidth = width/4;
-  
   playButtonHeight = height/5;
   howToPlayButtonHeight = height/5;
   
@@ -202,6 +182,7 @@ class Button {
       image(this.theHoverImage, this.x, this.y, this.width, this.height);
       if (mouseIsPressed) {
         state = this.changeState;
+        textState = "scene-one-1";
       }
     }
     else {
@@ -236,15 +217,52 @@ class Text {
     textSize(this.textSize);
     text(this.text, this.textX, this.textY);
   }
-  mouseClicked() {
+  changeState() {
     textState = this.textState;
+  }
+}
+
+class Card {
+  constructor(x, y, cardImage, chooseCardState) {
+    this.x = x;
+    this.y = y;
+    this.image = cardImage;
+    this.frame = cardFrame;
+    this.width = 150;
+    this.height = 200;
+    this.changeState = chooseCardState;
+  }
+  display() {
+    image(this.image, this.x, this.y, this.width, this.height);
+  }
+  hoverClick() {
+    if (this.checkIfInside(mouseX, mouseY)) {
+      image(this.frame, this.x-25.5, this.y-50, this.width+50, this.height+100);
+      if (mouseIsPressed) {
+        state = this.changeState;
+      }
+    }
+  }
+  checkIfInside(x, y) {
+    return x>this.x && x<this.x + this.width &&
+    y>this.y && y<this.y + this.height;
+  }
+}
+
+class Sprite {
+  constructor(x, y) {
+    this.x = x;
+    this.y = y;
+    this.width = 100;
+    this.height = 100;
+    this.speed = 5;
   }
 }
 
 // -------------------- OBJECT CREATION --------------------- //
 
 function createObject() {
-  thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene1-text");
+  thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene-one");
     
   theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "menu");
   theExitButton = new Button (width/3.5, height/2, exitButton, hoverExit, "test");
@@ -252,6 +270,10 @@ function createObject() {
   sceneOneText1 = new Text(width/15, height/2, emptyText, "Test 1");
   sceneOneText2 = new Text(width/15, height/2.5, emptyText, "Test 2");
   sceneOneText3 = new Text(width/15, height/2.5, emptyText, "Test 3");
+
+  theCardRock = new Card(100, height/2, cardRock, "rps-choseRock");
+  theCardPaper = new Card(400, height/2, cardRock, "rps-choseRock");
+  theCardScissors = new Card(700, height/2, cardRock, "rps-choseRock");
 }
 
 // ----------------------- TEXT STATE ---------------------- //
@@ -263,8 +285,20 @@ function theTextState() {
   else if (textState === "scene-one-2") {
     sceneOneText2.display();
   }
-  if (textState === "scene-one-3") {
+  else if (textState === "scene-one-3") {
     sceneOneText3.display();
+  }
+}
+
+function mouseClicked() {
+  if (textState === "scene-one-1") {
+    sceneOneText1.changeState();
+  }
+  if (textState === "scene-one-2") {
+    sceneOneText2.changeState();
+  }
+  if (textState === "scene-one-3") {
+    sceneOneText3.changeState();
   }
 }
 
@@ -284,9 +318,10 @@ function gameState() {
   else if (state === "test") {
     background(80);
   }
-  else if (state === "scene1-text") {
-    sceneOneText1.display();
+  else if (state === "scene-one") {
     theMenu.hoverClick();
+    theTextState();
+    mouseClicked();
   }
   // --- Rock Paper Scissors Minigame Gamestate --- // 
 
@@ -308,20 +343,6 @@ function gameState() {
     pressKeyEnter();
   }
   else if (state === "rps-play") {
-    displayCardRock();
-    displayCardPaper();
-    displayCardScissors();
-    displayRockFrame();
-    displayPaperFrame();
-    displayScissorsFrame();
-    displayMenuButton();
-
-    displayTitle();
-    hoverCards();
-    
-    pressRockCard();
-    pressPaperCard();
-    pressScissorsCard();
     pressMenu();
   }
   else if (state === "rps-menu") {
@@ -338,23 +359,15 @@ function gameState() {
     pressExitKeybindMenu();
   }
   else if (state === "rps-choseRock") {
-    displayCardRock();
-    displayYouChoseRock();
     displayOtherPressEnter();
-    changeCardRockPos();
     alreadyChoseCard();
   }
   else if (state === "rps-chosePaper") {
-    displayCardPaper();
-    displayYouChosePaper();
     displayOtherPressEnter();
     alreadyChoseCard();
   }
   else if (state === "rps-choseScissors") {
-    displayCardScissors();
-    displayYouChoseScissors();
     displayOtherPressEnter();
-    changeCardScissorsPos();
     alreadyChoseCard();
   }
   else if (state === "rps-results") {
@@ -365,51 +378,15 @@ function gameState() {
     displayYouWin();
     displayPressEsc();
     pressEscExit();
-    restoreCardPos();
   }
   else if (state === "rps-youLose") {
     displayYouLose();
     displayPressEsc();
     pressEscExit();
-    restoreCardPos();
   }
 }
 
 ////////// Display image functions /////////////////
-
-function displayTitle() {
-  image(title, width / 2, height /7, 200, 100);
-}
-
-function displayCardRock() {
-  image(cardR, xCardRock, yCardRock, cardWidth, cardHeight);
-}
-
-function displayCardPaper() {
-  image(cardP, xCardPaper, yCardPaper, cardWidth, cardHeight);
-}
-
-function displayCardScissors() {
-  image(cardS, xCardScissors, yCardScissors, cardWidth, cardHeight);
-}
-
-function displayRockFrame() {
-  if (rockHover === true) {
-    image(cardFrame, xCardRock, yCardRock, cardWidth + 105, cardHeight + 155);
-  }
-}
-
-function displayPaperFrame() {
-  if (paperHover === true) {
-    image(cardFrame, xCardPaper, yCardPaper, cardWidth + 105, cardHeight + 155);
-  }
-}
-
-function displayScissorsFrame() {
-  if (scissorsHover === true) {
-    image(cardFrame, xCardScissors, yCardScissors, cardWidth + 105, cardHeight + 155);
-  }
-}
 
 function displayhowToMenu() {
   image(howToPlayMenu, width/2, height/2, width/2, height/1.5);
@@ -461,18 +438,6 @@ function displayOtherPressEnter() {
   image(otherPressEnter, width/2, height/1.3, width/10, height/6);
 }
 
-function displayYouChoseRock() {
-  image(youChoseRock, width/2, yCardScissors/2.5, width/10, height/6);
-}
-
-function displayYouChosePaper() {
-  image(youChosePaper, width/2, yCardScissors/2.5, width/10, height/6);
-}
-
-function displayYouChoseScissors() {
-  image(youChoseScissors, width/2, yCardScissors/2.5, width/10, height/6);
-}
-
 function displayYouWin() {
   image(youWin, width/2, height/7, width/2.5, height/2.5);
 }
@@ -486,53 +451,6 @@ function displayPressEsc() {
 }
 
 ////////////// Chose card/Change functions ////////////////////
-
-function hoverCards() {
-  if (mouseX > xCardRock - cardWidth / 2 && mouseX < xCardRock + cardWidth / 2 && mouseY > yCardRock - cardHeight / 2 && mouseY < yCardRock + cardHeight / 2) {
-    rockHover = true;
-  }
-  else {
-    rockHover = false;
-  }
-  if (mouseX > xCardPaper - cardWidth / 2 && mouseX < xCardPaper + cardWidth / 2 && mouseY > yCardPaper - cardHeight / 2 && mouseY < yCardPaper + cardHeight / 2) {
-    paperHover = true;
-  }
-  else {
-    paperHover = false;
-  }
-  if (mouseX > xCardScissors - cardWidth / 2 && mouseX < xCardScissors + cardWidth / 2 && mouseY > yCardScissors - cardHeight / 2 && mouseY < yCardScissors + cardHeight / 2) {
-    scissorsHover = true;
-  } 
-  else {
-    scissorsHover = false;
-  }
-}
-
-function changeCardRockPos() {
-  xCardRock = width/2;
-  yCardRock = height/2;
-}
-
-function changeCardScissorsPos() {
-  xCardScissors = width/2;
-  yCardScissors = height/2;
-}
-
-function restoreCardPos() {
-  xCardRock = width/4;
-  yCardRock = height/2;
-
-  xCardPaper = width/2;
-  yCardPaper = height/2;
-
-  xCardScissors = width/1.3;
-  yCardScissors = height/2;
-  cardWidth = width/6;
-  cardHeight = height/2.2;
-
-  cardWidth = width/6;
-  cardHeight = height/2.2;
-}
 
 function restoreResult() {
   result = ["win", "lose"];
@@ -554,24 +472,6 @@ function randomResult() {
 function pressExitHowToPlayMenu() {
   if (mouseX > xExitMenu - exitMenuWidth/2 && mouseX < xExitMenu + exitMenuWidth/2 && mouseY > yExitMenu - exitMenuHeight/2 && mouseY < yExitMenu + exitMenuHeight/2 && mouseIsPressed || keyIsDown(27)) {
     state = "rps-start";
-  }
-}
-
-function pressRockCard() {
-  if (mouseX > xCardRock - cardWidth / 2 && mouseX < xCardRock + cardWidth / 2 && mouseY > yCardRock - cardHeight / 2 && mouseY < yCardRock + cardHeight / 2 && mouseIsPressed || keyIsDown(49)) {
-    state = "rps-choseRock";
-  }
-}
-
-function pressPaperCard() {
-  if (mouseX > xCardPaper - cardWidth / 2 && mouseX < xCardPaper + cardWidth / 2 && mouseY > yCardPaper - cardHeight / 2 && mouseY < yCardPaper + cardHeight / 2 && mouseIsPressed || keyIsDown(50)) {
-    state = "rps-chosePaper";
-  }
-}
-
-function pressScissorsCard() {
-  if (mouseX > xCardScissors - cardWidth / 2 && mouseX < xCardScissors + cardWidth / 2 && mouseY > yCardScissors - cardHeight / 2 && mouseY < yCardScissors + cardHeight / 2 && mouseIsPressed || keyIsDown(51)) {
-    state = "rps-choseScissors";
   }
 }
 
