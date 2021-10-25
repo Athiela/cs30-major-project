@@ -6,7 +6,7 @@
 
 // ---------------- General Game variables --------------------------------//
 
-let state = "start";
+let state = "rps-start";
 let font;
 
 // ------------------ Start Game variables --------------------------------//
@@ -33,23 +33,23 @@ let spriteFront, spriteback, spriteLeft, spriteRight;
 // card variables
 let cardRock, theCardRock, cardPaper, theCardPaper, cardScissors, theCardScissors, cardFrame;
 
-// play button variables
-let playButtonWidth, howToPlayButtonWidth, playButtonHeight, howToPlayButtonHeight, xHowToPlayButton, yHowToPlayButton, xPlayButton, yPlayButton, howToPlayButton, hoverHowToPlay, hoverPlay;
+// start menu variables
+let rpsPlayButton, howToPlayButton, rpsHowToPlayButton, hoverHowToPlay, hoverPlay, title, rpsStartTitle;
 
-// title variables
-let title, rpsStartTitle;
+// how to play menu variables
+let rpsExitMenu;
 
 // keybind variables
-let keybind, xKeybind, yKeybind, keybindWidth, keybindHeight, keybindMenu, hoverKeybind;
+let keybind, theKeybind, keybindMenu, theKeybindMenu, hoverKeybind;
 
 // win lose variables
 let youWin, youLose;
 
 // exit variables
-let exitButton, hoverExit, theExitButton, theHoverExit,exitMenu, xExitMenu, yExitMenu, exitMenuWidth, exitMenuHeight, areYouSureExit;
+let exitButton, theExitButton, hoverExit, exitMenu, areYouSureExit;
 
 // menu variables
-let  xMenu, yMenu, menuWidth, menuHeight, howToPlayMenu, menuButton, theMenu;
+let howToPlayMenu, theHowToPlayMenu, menuButton, theMenu;
 
 // press key variables
 let pressEnter, pressEsc, otherPressEnter;
@@ -102,12 +102,9 @@ function preload() {
   cardScissors = loadImage("assets/cardScissors.png");
 
   cardFrame = loadImage("assets/cardFrame.png");
-  
-  // playButton = loadImage("assets/playButton.png");
-  // howToPlayButton = loadImage("assets/howToPlayButton.png");
-  
-  // hoverPlay = loadImage("assets/hoverPlayButton.png");
-  // hoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
+
+  howToPlayButton = loadImage("assets/howToPlayButton.png");
+  hoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
 
   // youLose = loadImage("assets/youLose.png");
   // youWin = loadImage("assets/youWin.png");
@@ -127,7 +124,6 @@ function preload() {
 
 function setup() {
   createCanvas(800, 800);
-  rockPaperScissorsVariables();
   createObject();
 }
 
@@ -136,34 +132,7 @@ function draw() {
   gameState();
 }
 
-
-/////////////////// Variable defining for start menu  //////////////////////////
-
-function startMenuVariables() {
-
-}
-
 /////////////////// Variable defining for rock paper scissors  //////////////////////////
-
-function rockPaperScissorsVariables() {
-  playButtonHeight = height/5;
-  howToPlayButtonHeight = height/5;
-  
-  xExitMenu = width/20;
-  yExitMenu = height/12;
-  exitMenuWidth = width/15;
-  exitMenuHeight = height/10;
-  
-  xKeybind = width/2;
-  yKeybind = height/1.3;
-  keybindWidth = width/4;
-  keybindHeight = height/5;
-  
-  xMenu = width/20;   
-  yMenu = height/12;
-  menuWidth = width/15;
-  menuHeight = height/10;
-}
 
 // ----------------- OBJECTS ----------------------------- //
 
@@ -216,9 +185,6 @@ class Text {
     textFont(this.font);
     textSize(this.textSize);
     text(this.text, this.textX, this.textY);
-  }
-  changeState() {
-    textState = this.textState;
   }
 }
 
@@ -274,6 +240,11 @@ function createObject() {
   theCardRock = new Card(100, height/2, cardRock, "rps-choseRock");
   theCardPaper = new Card(400, height/2, cardRock, "rps-choseRock");
   theCardScissors = new Card(700, height/2, cardRock, "rps-choseRock");
+
+  rpsPlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "rps-play");
+  rpsHowToPlayButton = new Button(width/3.5, height/1.5, 350, 150, howToPlayButton, hoverHowToPlay, "rps-howToPlayMenu");
+
+  rpsExitMenu = new Button(width/20, height/12, width/15, height/10);
 }
 
 // ----------------------- TEXT STATE ---------------------- //
@@ -327,14 +298,14 @@ function gameState() {
 
   if (state === "rps-start") {
     restoreResult();
-    displayPlayButton();
-    displayHowToPlayButton();
-    displayStartTitle();
+    rpsPlayButton.hoverClick();
+    rpsHowToPlayButton.hoverClick();
+    image(rpsStartTitle, width/2, height/4, 400, 200);
   }
   else if (state === "rps-howToPlayMenu") {
     displayStartTitle();
-    displayhowToMenu();  
-    displayExitMenu();
+    image(howToPlayMenu, width/2, height/2, width/2, height/1.5);  
+    image(exitMenu, width/20, height/12, width/15, height/10);
     
     pressExitHowToPlayMenu();
   }
@@ -387,10 +358,6 @@ function gameState() {
 }
 
 ////////// Display image functions /////////////////
-
-function displayhowToMenu() {
-  image(howToPlayMenu, width/2, height/2, width/2, height/1.5);
-}
 function displayExitMenu() {
   image(exitMenu, width/20, height/12, width/15, height/10);
 }
@@ -404,24 +371,12 @@ function displayHowToPlayButton() {
 function displayStartTitle() {
   image(rpsStartTitle, width / 2, height / 4, 400, 200);
 }
-function displayHoverPlay() {
-  image(hoverPlay, xPlayButton, yPlayButton, playButtonWidth, playButtonHeight);
-}
-function displayHoverHowToPlay() {
-  image(hoverHowToPlay, xHowToPlayButton, yHowToPlayButton, howToPlayButtonWidth, howToPlayButtonHeight);
-}
-
 function displayMenuButton() {
   image(menuButton, xMenu, yMenu, menuWidth, menuHeight);
 }
 function displayKeybindButton() {
   image(keybind, xKeybind, yKeybind, keybindWidth, keybindHeight);
 }
-
-function displayHoverKeybindButton() {
-  image(hoverKeybind, xKeybind, yKeybind, keybindWidth, keybindHeight);
-}
-
 function displayKeybindMenu() {
   image(keybindMenu, width/2, height/2, width/2, height/1.5);
 }
@@ -480,7 +435,6 @@ function pressMenu() {
     state = "rps-menu";
   }
 }
-
 
 function pressKeyEnter() {
   if (keyIsDown(13)) {
