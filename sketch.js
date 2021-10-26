@@ -6,7 +6,7 @@
 
 // ---------------- General Game variables --------------------------------//
 
-let state = "rps-start";
+let state = "rps-play";
 let font;
 
 // ------------------ Start Game variables --------------------------------//
@@ -33,8 +33,11 @@ let spriteFront, spriteback, spriteLeft, spriteRight;
 // card variables
 let cardRock, theCardRock, cardPaper, theCardPaper, cardScissors, theCardScissors, cardFrame;
 
+// score variables
+let yourWinCount, theirWinCount;
+
 // start menu variables
-let rpsPlayButton, howToPlayButton, rpsHowToPlayButton, hoverHowToPlay, hoverPlay, title, rpsStartTitle;
+let rpsPlayButton, theRpsPlayButton, rpsHoverPlayButton, rpsHowToPlayButton, theRpsHowToPlayButton, rpsHoverHowToPlay, hoverPlay, title, rpsStartTitle, rpsOtherTitle;
 
 // how to play menu variables
 let rpsExitMenu;
@@ -92,33 +95,36 @@ function preload() {
 
   //----------- Rock Paper Scissors Minigame Preload -----------//
 
-  // rpsStartTitle = loadImage("assets/startTitle.png");
-  // title = loadImage("assets/title.png");
-  // howToPlayMenu = loadImage("assets/howPlayMenu.png");
-  // exitMenu = loadImage("assets/exitMenuButton.png");
+  rpsStartTitle = loadImage("assets/startTitle.png");
+  title = loadImage("assets/title.png");
+  rpsPlayButton = loadImage("assets/rpsPlayButton.png");
+  rpsHoverPlayButton = loadImage("assets/rpsHoverPlayButton.png");
+  howToPlayMenu = loadImage("assets/howPlayMenu.png");
+  exitMenu = loadImage("assets/exitMenuButton.png");
   
+  rpsOtherTitle = loadImage("assets/rpsOtherTitle.png");
   cardRock = loadImage("assets/cardRock.png");
   cardPaper = loadImage("assets/cardPaper.png");
   cardScissors = loadImage("assets/cardScissors.png");
 
   cardFrame = loadImage("assets/cardFrame.png");
 
-  howToPlayButton = loadImage("assets/howToPlayButton.png");
-  hoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
+  rpsHowToPlayButton = loadImage("assets/howToPlayButton.png");
+  rpsHoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
 
-  // youLose = loadImage("assets/youLose.png");
-  // youWin = loadImage("assets/youWin.png");
+  youLose = loadImage("assets/youLose.png");
+  youWin = loadImage("assets/youWin.png");
 
-  // hoverKeybind = loadImage("assets/hoverKeybindsButton.png");
-  // keybind = loadImage("assets/keybindButton.png");
-  // keybindMenu = loadImage("assets/keybindMenu.png");
-  // pressEnter = loadImage("assets/pressEnter.png");
-  // areYouSureExit = loadImage("assets/areYouSureExit.png");
-  // otherPressEnter = loadImage("assets/otherPressEnter.png");
-  // youChoseRock = loadImage("assets/youChoseRock.png");
-  // youChosePaper = loadImage("assets/youChosePaper.png");
-  // youChoseScissors = loadImage("assets/youChoseScissors.png");
-  // pressEsc = loadImage("assets/pressEscExit.png");
+  hoverKeybind = loadImage("assets/hoverKeybindsButton.png");
+  keybind = loadImage("assets/keybindButton.png");
+  keybindMenu = loadImage("assets/keybindMenu.png");
+  pressEnter = loadImage("assets/pressEnter.png");
+  areYouSureExit = loadImage("assets/areYouSureExit.png");
+  otherPressEnter = loadImage("assets/otherPressEnter.png");
+  youChoseRock = loadImage("assets/youChoseRock.png");
+  youChosePaper = loadImage("assets/youChosePaper.png");
+  youChoseScissors = loadImage("assets/youChoseScissors.png");
+  pressEsc = loadImage("assets/pressEscExit.png");
 }
 ////////////////// Setup //////////////////////////////////////
 
@@ -165,9 +171,11 @@ class Button {
 }
 
 class Text {
-  constructor(x, y, theImage, whatTextDisplay, whatTextChange) {
+  constructor(x, y, theImage, whatTextDisplay, whatTextChange, w, h) {
     this.x = x;
     this.y = y;
+    this.otherW = w;
+    this.otherH = h;
     this.image = theImage;
     this.w = width/1.15;
     this.h = height/2.2;
@@ -186,6 +194,12 @@ class Text {
     textSize(this.textSize);
     text(this.text, this.textX, this.textY);
   }
+  otherDisplay() {
+    fill(this.color);
+    textFont(this.font);
+    textSize(this.textSize);
+    text(this.text, this.textX, this.textY);
+  }
 }
 
 class Card {
@@ -194,8 +208,8 @@ class Card {
     this.y = y;
     this.image = cardImage;
     this.frame = cardFrame;
-    this.width = 150;
-    this.height = 200;
+    this.width = 200;
+    this.height = 270;
     this.changeState = chooseCardState;
   }
   display() {
@@ -203,7 +217,7 @@ class Card {
   }
   hoverClick() {
     if (this.checkIfInside(mouseX, mouseY)) {
-      image(this.frame, this.x-25.5, this.y-50, this.width+50, this.height+100);
+      image(this.frame, this.x-this.width/5.5, this.y-this.height/4.5, this.width+70, this.height+120);
       if (mouseIsPressed) {
         state = this.changeState;
       }
@@ -237,14 +251,19 @@ function createObject() {
   sceneOneText2 = new Text(width/15, height/2.5, emptyText, "Test 2");
   sceneOneText3 = new Text(width/15, height/2.5, emptyText, "Test 3");
 
-  theCardRock = new Card(100, height/2, cardRock, "rps-choseRock");
-  theCardPaper = new Card(400, height/2, cardRock, "rps-choseRock");
-  theCardScissors = new Card(700, height/2, cardRock, "rps-choseRock");
+  theCardRock = new Card(50, height/2.5, cardRock, "rps-choseRock");
+  theCardPaper = new Card(300, height/2.5, cardPaper, "rps-choseRock");
+  theCardScissors = new Card(550, height/2.5, cardScissors, "rps-choseRock");
 
-  rpsPlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "rps-play");
-  rpsHowToPlayButton = new Button(width/3.5, height/1.5, 350, 150, howToPlayButton, hoverHowToPlay, "rps-howToPlayMenu");
+  rpsPlayButton = new Button(width/3.5, height/2, 350, 150, rpsPlayButton, rpsHoverPlayButton, "rps-pressEnter");
+  rpsHowToPlayButton = new Button(width/3.5, height/1.5, 350, 150, rpsHowToPlayButton, rpsHoverHowToPlay, "rps-howToPlayMenu");
 
-  rpsExitMenu = new Button(width/20, height/12, width/15, height/10);
+  rpsExitMenu = new Button(width/20, height/12, width/15, height/10, "rps-start");
+
+  theKeybind = new Button(width/3.5, height/1.5, 350, 150, keybind, hoverKeybind, "rps-howToPlayMenu");
+
+  yourWinCount = new Text(50, height-10, )
+  theirWinCount = 
 }
 
 // ----------------------- TEXT STATE ---------------------- //
@@ -299,110 +318,62 @@ function gameState() {
   if (state === "rps-start") {
     restoreResult();
     rpsPlayButton.hoverClick();
-    rpsHowToPlayButton.hoverClick();
-    image(rpsStartTitle, width/2, height/4, 400, 200);
-  }
-  else if (state === "rps-howToPlayMenu") {
-    displayStartTitle();
-    image(howToPlayMenu, width/2, height/2, width/2, height/1.5);  
-    image(exitMenu, width/20, height/12, width/15, height/10);
-    
-    pressExitHowToPlayMenu();
+    image(rpsStartTitle, width/4.3, height/4, 400, 200);
   }
   else if (state === "rps-pressEnter") {
-    displayPressEnter();
+    image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressKeyEnter();
   }
   else if (state === "rps-play") {
-    pressMenu();
-  }
-  else if (state === "rps-menu") {
-    displayKeybindButton();
-    displayHoverKeybindButton();
-    displayStartTitle();
+    image(rpsOtherTitle, 250, 50, 300, 150);
+    theMenu.hoverClick();
+    theCardRock.display();
+    theCardRock.hoverClick();
+
+    theCardPaper.display();
+    theCardPaper.hoverClick();
+
+    theCardScissors.display();
+    theCardScissors.hoverClick();
+
+    fill("#dbd4d4");
+    textSize(23);
+    textAlign(CENTER, CENTER);
+    text("Win", 50, height-10);
   }
   else if (state === "rps-areYouSureExit") {
-    displayAreYouSureExit();
+    image(areYouSureExit, width/2, height/1.3, width/10, height/6);
     pressEnterToExit();
   }
   else if (state === "rps-keybind") {
-    displayKeybindMenu();
+    image(keybindMenu, width/2, height/2, width/1.5, height/1.5);
     pressExitKeybindMenu();
   }
   else if (state === "rps-choseRock") {
-    displayOtherPressEnter();
+    image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     alreadyChoseCard();
   }
   else if (state === "rps-chosePaper") {
-    displayOtherPressEnter();
+    image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     alreadyChoseCard();
   }
   else if (state === "rps-choseScissors") {
-    displayOtherPressEnter();
+    image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     alreadyChoseCard();
   }
   else if (state === "rps-results") {
     randomResult();
-
   }
   else if (state === "rps-youWin") {
-    displayYouWin();
-    displayPressEsc();
+    image(youWin, width/4, height/5, 350, 200);
+    image(pressEsc, width/3.8, height/2.5, 350, 200);
     pressEscExit();
   }
   else if (state === "rps-youLose") {
-    displayYouLose();
-    displayPressEsc();
+    image(youLose, width/4, height/5, 350, 200);
+    image(pressEsc, width/3.8, height/2.5, 350, 200);
     pressEscExit();
   }
-}
-
-////////// Display image functions /////////////////
-function displayExitMenu() {
-  image(exitMenu, width/20, height/12, width/15, height/10);
-}
-
-function displayPlayButton() {
-  image(playButton, xPlayButton, yPlayButton, playButtonWidth, playButtonHeight);
-}
-function displayHowToPlayButton() {
-  image(howToPlayButton, xHowToPlayButton, yHowToPlayButton, howToPlayButtonWidth, howToPlayButtonHeight);
-}
-function displayStartTitle() {
-  image(rpsStartTitle, width / 2, height / 4, 400, 200);
-}
-function displayMenuButton() {
-  image(menuButton, xMenu, yMenu, menuWidth, menuHeight);
-}
-function displayKeybindButton() {
-  image(keybind, xKeybind, yKeybind, keybindWidth, keybindHeight);
-}
-function displayKeybindMenu() {
-  image(keybindMenu, width/2, height/2, width/2, height/1.5);
-}
-
-function displayPressEnter() {
-  image(pressEnter, width /2, height /2, width/3, height/3);
-}
-
-function displayAreYouSureExit() {
-  image(areYouSureExit, width/2, height/2, width/2, height/1.5);
-}
-
-function displayOtherPressEnter() {
-  image(otherPressEnter, width/2, height/1.3, width/10, height/6);
-}
-
-function displayYouWin() {
-  image(youWin, width/2, height/7, width/2.5, height/2.5);
-}
-
-function displayYouLose() {
-  image(youLose, width/2, height/7, width/2.5, height/2.5);
-}
-
-function displayPressEsc() {
-  image(pressEsc, width /2, height /2, width/3, height/3);
 }
 
 ////////////// Chose card/Change functions ////////////////////
@@ -423,18 +394,6 @@ function randomResult() {
   }
 }
 ////////////// Press Buttons ///////////////
-
-function pressExitHowToPlayMenu() {
-  if (mouseX > xExitMenu - exitMenuWidth/2 && mouseX < xExitMenu + exitMenuWidth/2 && mouseY > yExitMenu - exitMenuHeight/2 && mouseY < yExitMenu + exitMenuHeight/2 && mouseIsPressed || keyIsDown(27)) {
-    state = "rps-start";
-  }
-}
-
-function pressMenu() {
-  if (mouseX > xMenu - menuWidth/2 && mouseX < xMenu + menuWidth/2 && mouseY > yMenu - menuHeight/2 && mouseY < yMenu + menuHeight/2 && mouseIsPressed) {
-    state = "rps-menu";
-  }
-}
 
 function pressKeyEnter() {
   if (keyIsDown(13)) {
