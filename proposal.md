@@ -1,17 +1,27 @@
-# Major Project Proposal
+# MAJOR PROJECT PROPOSAL
 
 An adventure rpg/visual novel with different minigames sprinkled throughout along with different endings.
 
-## Must Have's List
+## MUST HAVES LIST
 
-- Three types of minigames
-- Hidden/optional interactions
-- Three different endings
-- Background music
+**Rock Paper Scissors**
+- Way to keep track of score
 
-## Nice To Have List
+**Escape Room**
+- Let objects for interaction be at different places in the room instead of just on the sides
 
-- Character customization 
-- More minigames 
+**Avoid The Falling Objects**
+- Score (win after achieving a certain score)
+- Health (lose when health is at zero)
+- Lose health upon collision with object
+
+**Visual Novel Aspect**
+- Choices that affect the ending
+- Text including story
+
+**Ending**
+- Good/Bad ending depending on choices made and how well the minigames were performed
+
+## NICE TO HAVE LIST
 - Sound effects for several interactions
-- A secret ending earned with optional object obtained
+- A secret ending earned with secret objects obtained from minigames
