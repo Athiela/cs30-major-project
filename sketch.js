@@ -171,11 +171,9 @@ class Button {
 }
 
 class Text {
-  constructor(x, y, theImage, whatTextDisplay, whatTextChange, w, h) {
+  constructor(x, y, theImage, whatTextDisplay, whatTextChange) {
     this.x = x;
     this.y = y;
-    this.otherW = w;
-    this.otherH = h;
     this.image = theImage;
     this.w = width/1.15;
     this.h = height/2.2;
@@ -194,11 +192,24 @@ class Text {
     textSize(this.textSize);
     text(this.text, this.textX, this.textY);
   }
-  otherDisplay() {
+}
+
+class OtherText {
+  constructor(x, y, w, h, color, textSize, whatTextDisplay) {
+    this.x = x;
+    this.y = y;
+    this.w = w;
+    this.h = h;
+    this.text = whatTextDisplay;
+    this.color = color;
+    this.font = font;
+    this.textSize = textSize;
+  }
+  display() {
     fill(this.color);
     textFont(this.font);
     textSize(this.textSize);
-    text(this.text, this.textX, this.textY);
+    text(this.text, this.x, this.y);
   }
 }
 
@@ -262,7 +273,7 @@ function createObject() {
 
   theKeybind = new Button(width/3.5, height/1.5, 350, 150, keybind, hoverKeybind, "rps-howToPlayMenu");
 
-  yourWinCount = new Text(50, height-10, )
+  yourWinCount = new OtherText(50, height-10, width/1.15, )
   theirWinCount = 
 }
 
