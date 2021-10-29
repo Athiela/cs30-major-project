@@ -33,8 +33,8 @@ let escroomTitle, startButton, hoverStartButton;
 
 let xPlayButton, yPlayButton, playButtonHeight, playButtonWidth;
 
-// end menu variables, not yet in 
-let escroomYouWin;
+// end menu variables
+let escYouWin;
 
 // sprite variables
 let spriteWidth, spriteHeight, spriteFront, spriteBack, spriteLeft, spriteRight;
@@ -68,6 +68,10 @@ let playerX = 250;
 let playerY = 250;
 let speed = 5;
 
+// ---------------------- Avoid Falling objects minigame ----------------------- //
+
+let theObstacle, thePlayer;
+
 // -------------------- Rock Paper Scissors Minigame --------------------- //
 
 // card variables
@@ -88,7 +92,7 @@ let rpsExitMenu;
 let keybind, theKeybind, keybindMenu, theKeybindMenu, hoverKeybind;
 
 // win lose variables
-let youWin, youLose;
+let rpsYouWin, rpsYouLose;
 
 // exit variables
 let exitButton, theExitButton, hoverExit, exitMenu, areYouSureExit;
@@ -154,8 +158,8 @@ function preload() {
   rpsHowToPlayButton = loadImage("assets/howToPlayButton.png");
   rpsHoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
 
-  youLose = loadImage("assets/youLose.png");
-  youWin = loadImage("assets/youWin.png");
+  rpsYouLose = loadImage("assets/youLose.png");
+  rpsYouWin = loadImage("assets/youWin.png");
 
   pressEnter = loadImage("assets/pressEnter.png");
   areYouSureExit = loadImage("assets/areYouSureExit.png");
@@ -166,47 +170,47 @@ function preload() {
   pressEsc = loadImage("assets/pressEscExit.png");
 
   // -----------------------------------------------------------
-  // // start preload
-  // title = loadImage("assets/startTitle.png");
-  // startButton = loadImage("assets/playButton.png");
-  // hoverStartButton = loadImage("assets/hoverPlayButton.png");
 
-  // // end preload
-  // youWin = loadImage("assets/youEscaped.png");
-  // pressEnter = loadImage("assets/pressEnter.png");
+  // start preload
+  title = loadImage("assets/startTitle.png");
+  startButton = loadImage("assets/playButton.png");
+  hoverStartButton = loadImage("assets/hoverPlayButton.png");
 
-  // // tile preload
-  // ground = loadImage("assets/floor.png");
-  // wall = loadImage("assets/wall.png");
-  // door = loadImage("assets/door.png");
-  // poster = loadImage("assets/poster.png");
-  // boxes = loadImage("assets/box.png");
-  // chest = loadImage("assets/chest.png");
-  // bed = loadImage("assets/bed.png");
-  // cage = loadImage("assets/cage.png");
+  // end preload
+  escYouWin = loadImage("assets/youEscaped.png");
+  pressEnter = loadImage("assets/pressEnter.png");
 
-  // // text box preload
-  // interact = loadImage("assets/interact.png");
-  // textBoxEmpty = loadImage("assets/text-boxempty.png");
-  // textBoxItem = loadImage("assets/text-boxitem.png");
-  // textChest = loadImage("assets/text-chest.png");
-  // textDoorHasKey = loadImage("assets/text-doorhaskey.png");
-  // textDoorNoKey = loadImage("assets/text-doornokey.png");
-  // textFeedHamster = loadImage("assets/text-feedhamster.png");
-  // textHamsterFed = loadImage("assets/text-hamsterfed.png");
-  // textHamsterNoFood = loadImage("assets/text-hamsternofood.png");
-  // textPlant = loadImage("assets/text-plant.png");
-  // textGetItemFood = loadImage("assets/text-itemfood.png");
-  // textGetItemKey = loadImage("assets/text-itemkey.png");
+  // tile preload
+  ground = loadImage("assets/floor.png");
+  wall = loadImage("assets/wall.png");
+  door = loadImage("assets/door.png");
+  boxes = loadImage("assets/box.png");
+  chest = loadImage("assets/chest.png");
+  bed = loadImage("assets/bed.png");
+  cage = loadImage("assets/cage.png");
 
-  // // sprite image preload
-  // spriteFront = loadImage("assets/spriteFront.png");
-  // spriteBack = loadImage("assets/spriteBack.png");
-  // spriteLeft = loadImage("assets/spriteLeft.png");
-  // spriteRight = loadImage("assets/spriteRight.png");
+  // text box preload
+  interact = loadImage("assets/interact.png");
+  textBoxEmpty = loadImage("assets/text-boxempty.png");
+  textBoxItem = loadImage("assets/text-boxitem.png");
+  textChest = loadImage("assets/text-chest.png");
+  textDoorHasKey = loadImage("assets/text-doorhaskey.png");
+  textDoorNoKey = loadImage("assets/text-doornokey.png");
+  textFeedHamster = loadImage("assets/text-feedhamster.png");
+  textHamsterFed = loadImage("assets/text-hamsterfed.png");
+  textHamsterNoFood = loadImage("assets/text-hamsternofood.png");
+  textPlant = loadImage("assets/text-plant.png");
+  textGetItemFood = loadImage("assets/text-itemfood.png");
+  textGetItemKey = loadImage("assets/text-itemkey.png");
 
-  // // level preload
-  // room = loadStrings("assets/1-escape-room.txt");
+  // sprite image preload
+  spriteFront = loadImage("assets/spriteFront.png");
+  spriteBack = loadImage("assets/spriteBack.png");
+  spriteLeft = loadImage("assets/spriteLeft.png");
+  spriteRight = loadImage("assets/spriteRight.png");
+
+  // level preload
+  room = loadStrings("assets/1-escape-room.txt");
 
   // // music preload
   // music = loadSound("assets/music.mp3");
@@ -216,6 +220,7 @@ function preload() {
 function setup() {
   createCanvas(800, 800);
   createObject();
+  escroomSetup();
 }
 
 function draw() {
@@ -226,6 +231,28 @@ function draw() {
 /////////////////// Variable defining for rock paper scissors  //////////////////////////
 
 // ----------------- OBJECTS ----------------------------- //
+
+class Obstacle {
+  constructor() {
+    this.x = random(0, width);
+    this.y = 0;
+    this.w = 20;
+    this.h = 50;
+    this.speed = 5;
+
+  }
+  display() {
+    rect(this.x, this.y, this.w, this.h);
+  }
+  update() {
+    this.y += this.speed;
+  }
+  offScreen() {
+    if (this.y > height) {
+      
+    }
+  }
+}
 
 class Button {
   constructor(x, y, w, h, theImage, theHoverImage, changeState) {
@@ -337,12 +364,24 @@ class Card {
 }
 
 class Sprite {
-  constructor(x, y) {
+  constructor(x, y, w, h, image) {
     this.x = x;
     this.y = y;
-    this.width = 100;
-    this.height = 100;
+    this.w = w;
+    this.h = h;
     this.speed = 5;
+    this.image = image;
+  }
+  display() {
+    image(this.image, this.x, this.y, this.w, this.h);
+  }
+  update() {
+    if (keyIsDown(68)) { // right
+      this.x += this.speed;
+    }
+    else if (keyIsDown(65)) { // left
+      this.x -= this.speed;
+    }
   }
 }
 
@@ -368,6 +407,9 @@ function createObject() {
   rpsExitMenu = new Button(width/20, height/12, width/15, height/10, "rps-start");
 
   theKeybind = new Button(width/3.5, height/1.5, 350, 150, keybind, hoverKeybind, "rps-howToPlayMenu");
+
+  theObstacle = new Obstacle();
+  thePlayer = new Sprite(width/4, height+30, 100, 100, spriteFront);
 }
 
 // ----------------------- TEXT STATE ---------------------- //
@@ -385,10 +427,10 @@ function createObject() {
 // }
 
 // function mouseClicked() {
-//   if (textState === "scene-one-1") {
-//     sceneOneText1.changeState();
+//   if (textState === "scene-1") {
+//     state = 
 //   }
-//   if (textState === "scene-one-2") {
+//   if (textState === "scene-2") {
 //     sceneOneText2.changeState();
 //   }
 //   if (textState === "scene-one-3") {
@@ -402,11 +444,14 @@ function pressButtons() {
   if (keyIsDown(13) && state === "rps-pressEnter") {
     state = "rps-play";
   }
-  else if (keyIsDown(27) && (state === "rps-youLose" || state === "rps-youLose")) {
-    state = "rps-start";
+  else if (keyIsDown(27) && (state === "rps-youLose" || state === "rps-youWin")) {
+    state = "rps-wonlost";
   }
   else if (keyIsDown(13) && (state === "rps-choseRock" || state === "rps-chosePaper" || state === "rps-choseScissors")) {
     state = "rps-results";
+  }
+  else if (keyIsDown(13) && state === "scene-1") {
+    state = "esc-start";
   }
 }
 /////////////// Game State //////////////////////////////
@@ -427,8 +472,8 @@ function gameState() {
   }
   else if (state === "scene-one") {
     theMenu.hoverClick();
-    // theTextState();
-    // mouseClicked();
+    sceneOneText1.display();
+    pressButtons();
   }
   // --- Rock Paper Scissors Minigame Gamestate --- // 
 
@@ -474,26 +519,129 @@ function gameState() {
     randomResult();
   }
   else if (state === "rps-youWin") {
-    image(youWin, width/4, height/5, 350, 200);
+    image(rpsYouWin, width/4, height/5, 350, 200);
     image(pressEsc, width/3.8, height/2.5, 350, 200);
     
     pressButtons();
     // pressEscExit();
   }
   else if (state === "rps-youLose") {
-    image(youLose, width/4, height/5, 350, 200);
+    image(rpsYouLose, width/4, height/5, 350, 200);
     image(pressEsc, width/3.8, height/2.5, 350, 200);
 
     pressButtons();
     // pressEscExit();
   }
+  else if (state === "rps-wonlost") {
+    rpsWonOrLost();
+  }
   else if (state === "rps-lost") {
     background("red");
+    pressButtons();
   }
   else if (state === "rps-won") {
-    background("blue");
+    background(105);
+    pressButtons();
   }
   // --- Escape Room Minigame Gamestate --- // 
+  // start screen 
+  if (state === "esc-start") {
+    background(100);
+
+    image(title, width/3.5, 200, 350, 200);
+    hoverStartButtons();
+    pressPlay();
+  }
+  // state - walking around room
+  if (state === "esc-play") {
+    displayGrid();
+    characterMovement();
+    overBorder();
+    interactFurniture();
+  }
+  // state - check if you got item already or not
+  if (state === "esc-box-item") {
+    displayGrid();
+    exitText();
+    boxItem();
+  }
+  // state - ask if you want to pick up food
+  if (state === "esc-food-get") {
+    displayGrid();
+    image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    foodGet();
+  }
+  // state - food acquired
+  if (state === "esc-food-pickup") {
+    displayGrid();
+    image(textGetItemFood, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    exitText();
+  }
+  // state - check if you fed the hamster yet or not
+  if (state === "esc-cage") {
+    displayGrid();
+    cageInteraction();
+  }
+  // state - ask to feed hamster
+  if (state === "esc-feed-hamster") {
+    displayGrid();
+    image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    feedHamster();
+  }
+  // state - key acquired
+  if (state === "esc-key-pickup") {
+    displayGrid();
+    image(textGetItemKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    exitText();
+  }
+  // state - ask to use key
+  if (state === "esc-key-has") {
+    displayGrid();
+    image(textDoorHasKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    useKey();
+  }
+  // state - empty box dialogue
+  if (state === "esc-box-none") {
+    displayGrid();
+    exitText();
+    image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+  }
+  // state - plant dialogue
+  if (state === "esc-plant") {
+    displayGrid();
+    exitText();
+    image(textPlant, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+  }
+  // state - chest dialogue
+  if (state === "esc-chest") {
+    displayGrid();
+    exitText();
+    image(textChest, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+  }
+  // state - check to see if you have key to door
+  if (state === "esc-door") {
+    displayGrid();
+    exitText();
+    doorInteraction();
+  }
+  // state - you escaped!
+  if (state === "esc-you-win") {
+    background(119, 65, 65);
+    image(escYouWin, width/4, height/4, 400, 200);
+    image(pressEnter, width/4, height/1.8, 400, 200);
+    backToStart();
+  }
+  if (state === "scene-3") {
+    background("blue");
+  }
+  // --- Avoid Falling Objects MiniGame Gamestate --- //
+  else if (state === "avoid-start") {
+    background(107);
+    theObstacle.display();
+    theObstacle.update();
+    thePlayer.display();
+    thePlayer.update();
+  }
 }
 
 ////////////// Chose card/Change functions ////////////////////
@@ -532,10 +680,13 @@ function theirWinCount() {
 
 function rpsWonOrLost() {
   if (yourScore === 3) {
-    state = "rps-won";
+    state = "scene-1";
   }
   else if (theirScore === 3) {
-    state = "rps-lost";
+    state = "scene-1";
+  }
+  else {
+    state = "rps-start";
   }
 }
 
@@ -568,106 +719,6 @@ function escroomSetup() {
   yTextBox = height/4;
   textBoxWidth = width/1.4;
   textBoxHeight = height/2.2;
-
-  // music loop
-  music.loop();
-}
-
-function draw() {
-  background(220);
-  gameState();
-}
-
-/////////////////// game state //////////////////////////////
-
-function gameState() {
-  // state - start screen
-  if (state === "start") {
-    background(100);
-
-    image(title, width/3.5, 200, 350, 200);
-    hoverStartButtons();
-    pressPlay();
-  }
-  // state - walking around room
-  if (state === "play") {
-    displayGrid();
-    characterMovement();
-    overBorder();
-    interactFurniture();
-  }
-  // state - check if you got item already or not
-  if (state === "box-item") {
-    displayGrid();
-    exitText();
-    boxItem();
-  }
-  // state - ask if you want to pick up food
-  if (state === "food-get") {
-    displayGrid();
-    image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    foodGet();
-  }
-  // state - food acquired
-  if (state === "food-pickup") {
-    displayGrid();
-    image(textGetItemFood, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    exitText();
-  }
-  // state - check if you fed the hamster yet or not
-  if (state === "cage") {
-    displayGrid();
-    cageInteraction();
-  }
-  // state - ask to feed hamster
-  if (state === "feed-hamster") {
-    displayGrid();
-    image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    feedHamster();
-  }
-  // state - key acquired
-  if (state === "key-pickup") {
-    displayGrid();
-    image(textGetItemKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    exitText();
-  }
-  // state - ask to use key
-  if (state === "key-has") {
-    displayGrid();
-    image(textDoorHasKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    useKey();
-  }
-  // state - empty box dialogue
-  if (state === "box-none") {
-    displayGrid();
-    exitText();
-    image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-  }
-  // state - plant dialogue
-  if (state === "plant") {
-    displayGrid();
-    exitText();
-    image(textPlant, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-  }
-  // state - chest dialogue
-  if (state === "chest") {
-    displayGrid();
-    exitText();
-    image(textChest, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-  }
-  // state - check to see if you have key to door
-  if (state === "door") {
-    displayGrid();
-    exitText();
-    doorInteraction();
-  }
-  // state - you escaped!
-  if (state === "you-win") {
-    background(119, 65, 65);
-    image(youWin, width/4, height/4, 400, 200);
-    image(pressEnter, width/4, height/1.8, 400, 200);
-    backToStart();
-  }
 }
 
 ////////////////// display functions /////////////////////////////////
@@ -795,84 +846,84 @@ function interactFurniture() {
   // interact with box with item
   if (playerX < cellSize*2 && playerY < cellSize*1.7 && spritePosition ==="left") {
     if (keyIsDown(13)) {
-      state = "box-item";
+      state = "esc-box-item";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with cage
   else if (playerX < cellSize*2 && playerY < cellSize*2.7 && spritePosition ==="left") {
     if (keyIsDown(13)){
-      state = "cage";
+      state = "esc-cage";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with box without item
   else if (playerX < cellSize*2 && playerY < cellSize*3.7 && spritePosition ==="left") {
     if (keyIsDown(13)){
-      state = "box-none";
+      state = "esc-box-none";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with plant
   else if (playerX < cellSize*2 && playerY < cellSize*4.7 && spritePosition ==="left") {
     if (keyIsDown(13)){
-      state = "plant";
+      state = "esc-plant";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with plant
   else if (playerX < cellSize*2.5 && playerY > height-cellSize*1.9 && spritePosition ==="back") {
     if (keyIsDown(13)){
-      state = "plant";
+      state = "esc-plant";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with box without item
   else if (playerX < cellSize*3.5 && playerY > height-cellSize*1.9 && spritePosition ==="back") {
     if (keyIsDown(13)){
-      state = "box-none";
+      state = "esc-box-none";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with plant
   else if (playerX < cellSize*4.5 && playerY > height-cellSize*1.9 && spritePosition ==="back") {
     if (keyIsDown(13)){
-      state = "plant";
+      state = "esc-plant";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with box without item
   else if (playerX > width-cellSize*2 && playerY > height-cellSize*2.5 && spritePosition ==="right") {
     if (keyIsDown(13)){
-      state = "box-none";
+      state = "esc-box-none";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with box without item
   else if (playerX > width-cellSize*2 && playerY > height-cellSize*3.5 && spritePosition ==="right") {
     if (keyIsDown(13)){
-      state = "box-none";
+      state = "esc-box-none";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with chest
   else if (playerX > width-cellSize*2 && playerY > height-cellSize*4.5 && spritePosition ==="right") {
     if (keyIsDown(13)){
-      state = "chest";
+      state = "esc-chest";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with box without item
   else if (playerX > width-cellSize*2 && playerY > height-cellSize*5.5 && spritePosition ==="right") {
     if (keyIsDown(13)){
-      state = "box-none";
+      state = "esc-box-none";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
   // interact with door
   else if (playerX > cellSize*2.5 && playerX < cellSize*3.5 && playerY < cellSize+30 && spritePosition ==="forward") {
     if (keyIsDown(13)){
-      state = "door";
+      state = "esc-door";
     }
     image(interact, playerX, playerY-30, width/8, height/15);
   }
@@ -881,37 +932,37 @@ function interactFurniture() {
 // exit text with escape key
 function exitText() {
   if (keyIsDown(27)){
-    state = "play";
+    state = "esc-play";
   }
 }
 
 // ask to pick up food function
 function foodGet() {
   if (keyIsDown(49)){
-    state = "food-pickup";
-    hasFood = "yes";
+    state = "esc-food-pickup";
+    hasFood = "esc-yes";
   }
   else if (keyIsDown(50)){
-    state = "play";
+    state = "esc-play";
   }
 }
 
 // ask to feed hamster function
 function feedHamster() {
   if (keyIsDown(49)){
-    state = "key-pickup";
+    state = "esc-key-pickup";
     hasKey = "yes";
     isFed = "yes";
   }
   else if (keyIsDown(50)){
-    state = "play";
+    state = "esc-play";
   }
 }
 
 // check to see if you got item from box yet function
 function boxItem() {
   if (hasFood === "no") {
-    state = "food-get";
+    state = "esc-food-get";
   }
   if (hasFood === "yes") {
     image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
@@ -921,10 +972,10 @@ function boxItem() {
 // ask to use key function
 function useKey() {
   if (keyIsDown(49)){
-    state = "you-win";
+    state = "esc-you-win";
   }
   else if (keyIsDown(50)){
-    state = "play";
+    state = "esc-play";
   }
 }
 
@@ -935,7 +986,7 @@ function cageInteraction() {
     exitText();
   }
   else if (hasFood === "yes" && isFed === "not-fed") {
-    state = "feed-hamster";
+    state = "esc-feed-hamster";
   }
   else if (isFed === "yes") {
     image(textHamsterFed, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
@@ -946,7 +997,7 @@ function cageInteraction() {
 // check to see if you have a key function
 function doorInteraction() {
   if (hasKey === "yes") {
-    state = "key-has";
+    state = "esc-key-has";
   }
   if (hasKey === "no") {
     image(textDoorNoKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
@@ -969,14 +1020,14 @@ function hoverStartButtons() {
 
 function pressPlay() {
   if (mouseX > xPlayButton && mouseX < xPlayButton + playButtonWidth && mouseY > yPlayButton && mouseY < yPlayButton + playButtonHeight && mouseIsPressed) {
-    state = "play";
+    state = "esc-play";
   }
 }
 
 function backToStart() {
   if (keyIsDown(13)) {
     // state back to start
-    state = "start";
+    state = "scene-3";
 
     // restore
     hasFood = "no";
