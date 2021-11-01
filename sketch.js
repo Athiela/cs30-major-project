@@ -6,7 +6,7 @@
 
 // ---------------- General Game variables --------------------------------//
 
-let state = "esc-start";
+let state = "esc-box-item";
 let font;
 
 // ------------------ Start Game variables --------------------------------//
@@ -23,13 +23,16 @@ let text1, theText;
 // scene 1 text
 let sceneOneText1, sceneOneText2, sceneOneText3;
 
+// dialogue
+let dialogue;
+
 // -------------------- Escape Room Minigame ----------------------------- //
 
 // music variable
 let music;
 
 // start menu variables
-let escroomTitle, startButton, hoverStartButton;
+let escTitle, escStartButton, hoverEscStartButton, theEscStartButton;
 
 let xPlayButton, yPlayButton, playButtonHeight, playButtonWidth;
 
@@ -44,7 +47,7 @@ let spritePosition = "back";
 let ground, wall, door, poster, room, boxes;
 
 // furniture variables
-let chest, bed, cage;
+let chest, plant, cage;
 
 // interaction variables
 let interact;
@@ -56,6 +59,8 @@ let hasKey = "no";
 let textBoxEmpty, textBoxItem, textChest, textDoorHasKey, textDoorNoKey, textFeedHamster, textHamsterFed, textHamsterHideItem, textHamsterNoFood, textPlant, textGetItemFood, textGetItemKey;
 let xTextBox, yTextBox, textBoxWidth, textBoxHeight;
 
+let boxEmpty, boxItem, theChest, doorHasKey, doorNoKey, feedHamster, hamsterFed, hamsterHideItem, hamsterNoFood, thePlant, getItemFood, getItemKey;
+let escYes, escNo;
 
 // state variables
 let playerState = "move";
@@ -131,6 +136,10 @@ function preload() {
   playButton = loadImage("assets/playButton.png");
   hoverPlayButton = loadImage("assets/hoverPlayButton.png");
 
+  // ------------------ Text Preload -------------------- //
+
+  dialogue = loadStrings("assets/2-dialogue.txt");
+
   //------------------- Menu Preload ------------------- //
 
   menuButton = loadImage("assets/menuButton.png");
@@ -172,9 +181,9 @@ function preload() {
   // -----------------------------------------------------------
 
   // start preload
-  title = loadImage("assets/startTitle.png");
-  startButton = loadImage("assets/playButton.png");
-  hoverStartButton = loadImage("assets/hoverPlayButton.png");
+  escTitle = loadImage("assets/escroom-startTitle.png");
+  escStartButton = loadImage("assets/playButton.png");
+  hoverEscStartButton = loadImage("assets/hoverPlayButton.png");
 
   // end preload
   escYouWin = loadImage("assets/youEscaped.png");
@@ -186,7 +195,7 @@ function preload() {
   door = loadImage("assets/door.png");
   boxes = loadImage("assets/box.png");
   chest = loadImage("assets/chest.png");
-  bed = loadImage("assets/bed.png");
+  plant = loadImage("assets/plant.png");
   cage = loadImage("assets/cage.png");
 
   // text box preload
@@ -247,11 +256,6 @@ class Obstacle {
   update() {
     this.y += this.speed;
   }
-  offScreen() {
-    if (this.y > height) {
-      
-    }
-  }
 }
 
 class Button {
@@ -283,10 +287,10 @@ class Button {
 }
 
 class Text {
-  constructor(x, y, theImage, whatTextDisplay, whatTextChange) {
+  constructor(x, y, whatTextDisplay) {
     this.x = x;
     this.y = y;
-    this.image = theImage;
+    this.image = emptyText;
     this.w = width/1.15;
     this.h = height/2.2;
     this.textX = x+50;
@@ -295,7 +299,6 @@ class Text {
     this.font = font;
     this.textSize = 23;
     this.text = whatTextDisplay;
-    this.textState = whatTextChange;
   }
   display() {
     image(this.image, this.x, this.y, this.w, this.h);
@@ -331,8 +334,6 @@ class OtherText {
       fill(this.color);
       text(this.text + this.theirScore, this.x, this.y);
     }
-  }
-  update() {
   }
 }
 
@@ -393,6 +394,7 @@ class Sprite {
         image(spriteFront, playerX, playerY, spriteWidth, spriteHeight);
         spritePosition = "back";
       }
+    }
   }
 }
 
@@ -404,9 +406,9 @@ function createObject() {
   theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "menu");
   theExitButton = new Button (width/3.5, height/2, exitButton, hoverExit, "test");
   
-  sceneOneText1 = new Text(width/15, height/2, emptyText, "Test 1");
-  sceneOneText2 = new Text(width/15, height/2.5, emptyText, "Test 2");
-  sceneOneText3 = new Text(width/15, height/2.5, emptyText, "Test 3");
+  sceneOneText1 = new Text(width/15, height/2, "Test 1");
+  sceneOneText2 = new Text(width/15, height/2.5, "Test 2");
+  sceneOneText3 = new Text(width/15, height/2.5, "Test 3");
 
   theCardRock = new Card(50, height/2.5, cardRock, "rps-choseRock");
   theCardPaper = new Card(300, height/2.5, cardPaper, "rps-choseRock");
@@ -421,39 +423,26 @@ function createObject() {
 
   theObstacle = new Obstacle();
   thePlayer = new Sprite(width/4, height+30, 100, 100, spriteFront);
-}
 
+  theEscStartButton = new Button(width/3.5, height/2, 350, 150, escStartButton, hoverEscStartButton, "esc-play");
+
+  boxEmpty = new Text(width/1.4, height/2.5, "An empty box.");
+  boxItem = new Text(width/1.4, height/2.5, "There is something in this box. Open?");
+
+  escYes = new OtherText(width/1.4, height/2.5, "white", 30, "[1] Yes");
+  escNo = new OtherText(width/1.2, height/2.5, "white", 30, "[2] No" );
+}
 // ----------------------- TEXT STATE ---------------------- //
 
-// function theTextState() {
-//   if (textState === "scene-one-1") {
-//     sceneOneText1.display();
-//   }
-//   else if (textState === "scene-one-2") {
-//     sceneOneText2.display();
-//   }
-//   else if (textState === "scene-one-3") {
-//     sceneOneText3.display();
-//   }
-// }
-
-// function mouseClicked() {
-//   if (textState === "scene-1") {
-//     state = 
-//   }
-//   if (textState === "scene-2") {
-//     sceneOneText2.changeState();
-//   }
-//   if (textState === "scene-one-3") {
-//     sceneOneText3.changeState();
-//   }
-// }
-        
+    
 ////////////// Press Buttons ///////////////
         
 function pressButtons() {
   if (keyIsDown(13) && state === "rps-pressEnter") {
     state = "rps-play";
+  }
+  else if (keyIsDown(13) && state === "scene-one") {
+    state = "rps-start";
   }
   else if (keyIsDown(27) && (state === "rps-youLose" || state === "rps-youWin")) {
     state = "rps-wonlost";
@@ -461,10 +450,28 @@ function pressButtons() {
   else if (keyIsDown(13) && (state === "rps-choseRock" || state === "rps-chosePaper" || state === "rps-choseScissors")) {
     state = "rps-results";
   }
-  else if (keyIsDown(13) && state === "scene-1") {
+  else if (keyIsDown(13) && state === "rps-won") {
+    state = "scene-two";
+  }
+  else if (keyIsDown(13) && state === "rps-lost") {
+    state = "scene-two";
+  }
+  else if (keyIsDown(13) && state === "scene-two") {
     state = "esc-start";
   }
+  else if (keyIsDown(13) && state === "esc-you-win") {
+    // state back to start
+    state = "scene-3";
+    
+    // restore
+    hasFood = "no";
+    isFed = "not-fed";
+    hasKey = "no";
+  }
 }
+
+
+
 /////////////// Game State //////////////////////////////
         
 function gameState() {
@@ -482,8 +489,8 @@ function gameState() {
     background(80);
   }
   else if (state === "scene-one") {
+    background("blue");
     theMenu.hoverClick();
-    sceneOneText1.display();
     pressButtons();
   }
   // --- Rock Paper Scissors Minigame Gamestate --- // 
@@ -519,7 +526,6 @@ function gameState() {
   }
   else if (state === "rps-chosePaper") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
-
     pressButtons();
   }
   else if (state === "rps-choseScissors") {
@@ -534,14 +540,12 @@ function gameState() {
     image(pressEsc, width/3.8, height/2.5, 350, 200);
     
     pressButtons();
-    // pressEscExit();
   }
   else if (state === "rps-youLose") {
     image(rpsYouLose, width/4, height/5, 350, 200);
     image(pressEsc, width/3.8, height/2.5, 350, 200);
 
     pressButtons();
-    // pressEscExit();
   }
   else if (state === "rps-wonlost") {
     rpsWonOrLost();
@@ -554,14 +558,17 @@ function gameState() {
     background(105);
     pressButtons();
   }
+  else if (state === "scene-two") {
+    background("yellow");
+    pressButtons();
+  }
   // --- Escape Room Minigame Gamestate --- // 
+
   // start screen 
   if (state === "esc-start") {
     background(100);
-
-    image(title, width/3.5, 200, 350, 200);
-    hoverStartButtons();
-    pressPlay();
+    image(escTitle, width/3.5, 200, 350, 200);
+    theEscStartButton.hoverClick();
   }
   // state - walking around room
   if (state === "esc-play") {
@@ -574,12 +581,14 @@ function gameState() {
   if (state === "esc-box-item") {
     displayGrid();
     exitText();
-    boxItem();
+    boxHasItem();
   }
   // state - ask if you want to pick up food
   if (state === "esc-food-get") {
     displayGrid();
-    image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    boxItem.display();
+    escYes.display();
+    escNo.display();
     foodGet();
   }
   // state - food acquired
@@ -597,7 +606,7 @@ function gameState() {
   if (state === "esc-feed-hamster") {
     displayGrid();
     image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
-    feedHamster();
+    feedHamsterInteraction();
   }
   // state - key acquired
   if (state === "esc-key-pickup") {
@@ -640,7 +649,7 @@ function gameState() {
     background(119, 65, 65);
     image(escYouWin, width/4, height/4, 400, 200);
     image(pressEnter, width/4, height/1.8, 400, 200);
-    backToStart();
+    pressButtons();
   }
   if (state === "scene-3") {
     background("blue");
@@ -691,10 +700,10 @@ function theirWinCount() {
 
 function rpsWonOrLost() {
   if (yourScore === 3) {
-    state = "scene-1";
+    state = "scene-two";
   }
   else if (theirScore === 3) {
-    state = "scene-1";
+    state = "scene-two";
   }
   else {
     state = "rps-start";
@@ -719,17 +728,6 @@ function escroomSetup() {
   // sprite setup
   spriteWidth = 100;
   spriteHeight = 100;
-
-  // button setup
-  xPlayButton = width/3.5;
-  yPlayButton = height/2;
-  playButtonWidth = 350;
-  playButtonHeight = 150;
-
-  xTextBox = width/7;
-  yTextBox = height/4;
-  textBoxWidth = width/1.4;
-  textBoxHeight = height/2.2;
 }
 
 ////////////////// display functions /////////////////////////////////
@@ -749,9 +747,9 @@ function displayGrid() {
       if (grid[y][x] === "2") {
         image(door, x*cellSize, y*cellSize, cellSize, cellSize);
       }
-      // bed **note: change to plant**
+      // plant
       if (grid[y][x] === "3") {
-        image(bed, x*cellSize, y*cellSize, cellSize, cellSize);
+        image(plant, x*cellSize, y*cellSize, cellSize, cellSize);
       }
       // cage
       if (grid[y][x] === "4") {
@@ -851,18 +849,10 @@ function overBorder() {
   }
 }
 
-function pointInWall(x, y, wall) {
-  return inRange(x, wall.x + gridDimensions) &&
-         inRange(y, wall.y + gridDimensions);
+function hitWall(newX, newY) {
+  
 }
 
-function inRange(coordinate, min, max) {
-  return coordinate >= Math.min(min,max) && Math.max(min, max);
-}
-
-function hitWall() {
-  if (pointInWall(playerX, playerY, grid[i].x, grid[i].y))
-}
 
 ////////////////////////// Character interaction /////////////////////////////////////////
 
@@ -955,7 +945,7 @@ function interactFurniture() {
 
 // exit text with escape key
 function exitText() {
-  if (keyIsDown(27)){
+  if (keyIsDown(27)) {
     state = "esc-play";
   }
 }
@@ -972,7 +962,7 @@ function foodGet() {
 }
 
 // ask to feed hamster function
-function feedHamster() {
+function feedHamsterInteraction() {
   if (keyIsDown(49)){
     state = "esc-key-pickup";
     hasKey = "yes";
@@ -984,12 +974,12 @@ function feedHamster() {
 }
 
 // check to see if you got item from box yet function
-function boxItem() {
+function boxHasItem() {
   if (hasFood === "no") {
     state = "esc-food-get";
   }
   if (hasFood === "yes") {
-    image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
+    boxEmpty.display();
   }
 }
 
@@ -1026,36 +1016,5 @@ function doorInteraction() {
   if (hasKey === "no") {
     image(textDoorNoKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
-  }
-}
-
-///////////////////////// Button hover and press /////////////////////////////////////////
-
-function hoverStartButtons() {
-  // hovering
-  if (mouseX > xPlayButton && mouseX < xPlayButton + playButtonWidth && mouseY > yPlayButton && mouseY < yPlayButton + playButtonHeight) {
-    image(hoverStartButton, xPlayButton, yPlayButton, playButtonWidth, playButtonHeight);
-  }
-  // not hovering
-  else {
-    image(startButton, xPlayButton, yPlayButton, playButtonWidth, playButtonHeight);
-  }
-}
-
-function pressPlay() {
-  if (mouseX > xPlayButton && mouseX < xPlayButton + playButtonWidth && mouseY > yPlayButton && mouseY < yPlayButton + playButtonHeight && mouseIsPressed) {
-    state = "esc-play";
-  }
-}
-
-function backToStart() {
-  if (keyIsDown(13)) {
-    // state back to start
-    state = "scene-3";
-
-    // restore
-    hasFood = "no";
-    isFed = "not-fed";
-    hasKey = "no";
   }
 }
