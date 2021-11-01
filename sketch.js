@@ -6,7 +6,7 @@
 
 // ---------------- General Game variables --------------------------------//
 
-let state = "rps-start";
+let state = "esc-start";
 let font;
 
 // ------------------ Start Game variables --------------------------------//
@@ -382,6 +382,17 @@ class Sprite {
     else if (keyIsDown(65)) { // left
       this.x -= this.speed;
     }
+    if (playerState === "move") {
+      if (keyIsDown(87)){ //w
+        playerY -= speed;
+        image(spriteBack, playerX, playerY, spriteWidth, spriteHeight);
+        spritePosition = "forward";
+      }
+      else if (keyIsDown(83)){ //s
+        playerY += speed;
+        image(spriteFront, playerX, playerY, spriteWidth, spriteHeight);
+        spritePosition = "back";
+      }
   }
 }
 
@@ -838,6 +849,19 @@ function overBorder() {
   if (playerY > height-cellSize*1.7) {
     playerY = playerY - speed;
   }
+}
+
+function pointInWall(x, y, wall) {
+  return inRange(x, wall.x + gridDimensions) &&
+         inRange(y, wall.y + gridDimensions);
+}
+
+function inRange(coordinate, min, max) {
+  return coordinate >= Math.min(min,max) && Math.max(min, max);
+}
+
+function hitWall() {
+  if (pointInWall(playerX, playerY, grid[i].x, grid[i].y))
 }
 
 ////////////////////////// Character interaction /////////////////////////////////////////
