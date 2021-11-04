@@ -6,8 +6,15 @@
 
 // ---------------- General Game variables --------------------------------//
 
-let state = "esc-box-item";
+// state 
+let state = "scene-two-pt2";
+
 let font;
+let bgScene;
+
+// endings
+let trueEnd = 0;
+let badEnd = 0;
 
 // ------------------ Start Game variables --------------------------------//
 
@@ -22,9 +29,6 @@ let text1, theText;
 
 // scene 1 text
 let sceneOneText1, sceneOneText2, sceneOneText3;
-
-// dialogue
-let dialogue;
 
 // -------------------- Escape Room Minigame ----------------------------- //
 
@@ -73,9 +77,7 @@ let playerX = 250;
 let playerY = 250;
 let speed = 5;
 
-// ---------------------- Avoid Falling objects minigame ----------------------- //
-
-let theObstacle, thePlayer;
+let youEscaped;
 
 // -------------------- Rock Paper Scissors Minigame --------------------- //
 
@@ -112,6 +114,7 @@ let pressEnter, pressEsc, otherPressEnter;
 let youChoseRock, youChosePaper, youChoseScissors;
 
 // result variable
+let theResult;
 let result = ["win", "lose"];
 
 // hover variables
@@ -122,63 +125,35 @@ let playButtonHover = false;
 let howToPlayButtonHover = false;
 let HowPlayMenu = false;
 
+// ---------------------- Catch Falling objects minigame ----------------------- //
+
+let vase, playerCatchX, playerCatchY, objectX, objectY, objectWidth, objectHeight, objectSpeed, playerSpeed, newXPos;
+let catchScore = 0;
+let health = 4;
+let healthTally, scoreTally;
+
 ///////////////////////// Load Images //////////////////////////
 
 function preload() {
-  // ----------------- Font/Text Preload ---------------- //
+  // ----------------- Font/Text Preload -------------------- //
 
   emptyText = loadImage("assets/empty-textbox.png");
   font = loadFont("assets/font.ttf");
 
-  // ------------------ Start Preload ------------------ //
+  // ------------------ Start Preload ----------------------- //
 
   gameTitle = loadImage("assets/gameTitle.png");
   playButton = loadImage("assets/playButton.png");
   hoverPlayButton = loadImage("assets/hoverPlayButton.png");
+  bgScene = loadImage("assets/bgText.png");
 
-  // ------------------ Text Preload -------------------- //
-
-  dialogue = loadStrings("assets/2-dialogue.txt");
-
-  //------------------- Menu Preload ------------------- //
+  //------------------- Menu Preload ----------------------- //
 
   menuButton = loadImage("assets/menuButton.png");
   hoverExit = loadImage("assets/hoverExitButton.png");
   exitButton = loadImage("assets/exitButton.png");
 
-  //----------- Escape Room Minigame Preload -----------//
-
-  //----------- Rock Paper Scissors Minigame Preload -----------//
-
-  rpsStartTitle = loadImage("assets/startTitle.png");
-  title = loadImage("assets/title.png");
-  rpsPlayButton = loadImage("assets/rpsPlayButton.png");
-  rpsHoverPlayButton = loadImage("assets/rpsHoverPlayButton.png");
-  howToPlayMenu = loadImage("assets/howPlayMenu.png");
-  exitMenu = loadImage("assets/exitMenuButton.png");
-  
-  rpsOtherTitle = loadImage("assets/rpsOtherTitle.png");
-  cardRock = loadImage("assets/cardRock.png");
-  cardPaper = loadImage("assets/cardPaper.png");
-  cardScissors = loadImage("assets/cardScissors.png");
-
-  cardFrame = loadImage("assets/cardFrame.png");
-
-  rpsHowToPlayButton = loadImage("assets/howToPlayButton.png");
-  rpsHoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
-
-  rpsYouLose = loadImage("assets/youLose.png");
-  rpsYouWin = loadImage("assets/youWin.png");
-
-  pressEnter = loadImage("assets/pressEnter.png");
-  areYouSureExit = loadImage("assets/areYouSureExit.png");
-  otherPressEnter = loadImage("assets/otherPressEnter.png");
-  youChoseRock = loadImage("assets/youChoseRock.png");
-  youChosePaper = loadImage("assets/youChosePaper.png");
-  youChoseScissors = loadImage("assets/youChoseScissors.png");
-  pressEsc = loadImage("assets/pressEscExit.png");
-
-  // -----------------------------------------------------------
+  //----------- Escape Room Minigame Preload ---------------//
 
   // start preload
   escTitle = loadImage("assets/escroom-startTitle.png");
@@ -221,8 +196,41 @@ function preload() {
   // level preload
   room = loadStrings("assets/1-escape-room.txt");
 
-  // // music preload
-  // music = loadSound("assets/music.mp3");
+  youEscaped = loadImage("assets/youEscaped.png");
+
+  //------- Rock Paper Scissors Minigame Preload -----------//
+
+  rpsStartTitle = loadImage("assets/startTitle.png");
+  title = loadImage("assets/title.png");
+  rpsPlayButton = loadImage("assets/rpsPlayButton.png");
+  rpsHoverPlayButton = loadImage("assets/rpsHoverPlayButton.png");
+  howToPlayMenu = loadImage("assets/howPlayMenu.png");
+  exitMenu = loadImage("assets/exitMenuButton.png");
+  
+  rpsOtherTitle = loadImage("assets/rpsOtherTitle.png");
+  cardRock = loadImage("assets/cardRock.png");
+  cardPaper = loadImage("assets/cardPaper.png");
+  cardScissors = loadImage("assets/cardScissors.png");
+
+  cardFrame = loadImage("assets/cardFrame.png");
+
+  rpsHowToPlayButton = loadImage("assets/howToPlayButton.png");
+  rpsHoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
+
+  rpsYouLose = loadImage("assets/youLose.png");
+  rpsYouWin = loadImage("assets/youWin.png");
+
+  pressEnter = loadImage("assets/pressEnter.png");
+  areYouSureExit = loadImage("assets/areYouSureExit.png");
+  otherPressEnter = loadImage("assets/otherPressEnter.png");
+  youChoseRock = loadImage("assets/youChoseRock.png");
+  youChosePaper = loadImage("assets/youChosePaper.png");
+  youChoseScissors = loadImage("assets/youChoseScissors.png");
+  pressEsc = loadImage("assets/pressEscExit.png");
+
+  // -------------- Catch Minigame Preload --------------------- //
+
+  vase = loadImage("assets/vase.png");
 }
 ////////////////// Setup //////////////////////////////////////
 
@@ -230,6 +238,7 @@ function setup() {
   createCanvas(800, 800);
   createObject();
   escroomSetup();
+  catchObjectsSetup();
 }
 
 function draw() {
@@ -240,23 +249,6 @@ function draw() {
 /////////////////// Variable defining for rock paper scissors  //////////////////////////
 
 // ----------------- OBJECTS ----------------------------- //
-
-class Obstacle {
-  constructor() {
-    this.x = random(0, width);
-    this.y = 0;
-    this.w = 20;
-    this.h = 50;
-    this.speed = 5;
-
-  }
-  display() {
-    rect(this.x, this.y, this.w, this.h);
-  }
-  update() {
-    this.y += this.speed;
-  }
-}
 
 class Button {
   constructor(x, y, w, h, theImage, theHoverImage, changeState) {
@@ -273,7 +265,6 @@ class Button {
       image(this.theHoverImage, this.x, this.y, this.width, this.height);
       if (mouseIsPressed) {
         state = this.changeState;
-        textState = "scene-one-1";
       }
     }
     else {
@@ -295,13 +286,12 @@ class Text {
     this.h = height/2.2;
     this.textX = x+50;
     this.textY = y+70;
-    this.color = "#dbd4d4";
+    this.color = "white";
     this.font = font;
     this.textSize = 23;
     this.text = whatTextDisplay;
   }
   display() {
-    image(this.image, this.x, this.y, this.w, this.h);
     fill(this.color);
     textFont(this.font);
     textSize(this.textSize);
@@ -364,51 +354,12 @@ class Card {
   }
 }
 
-class Sprite {
-  constructor(x, y, w, h, image) {
-    this.x = x;
-    this.y = y;
-    this.w = w;
-    this.h = h;
-    this.speed = 5;
-    this.image = image;
-  }
-  display() {
-    image(this.image, this.x, this.y, this.w, this.h);
-  }
-  update() {
-    if (keyIsDown(68)) { // right
-      this.x += this.speed;
-    }
-    else if (keyIsDown(65)) { // left
-      this.x -= this.speed;
-    }
-    if (playerState === "move") {
-      if (keyIsDown(87)){ //w
-        playerY -= speed;
-        image(spriteBack, playerX, playerY, spriteWidth, spriteHeight);
-        spritePosition = "forward";
-      }
-      else if (keyIsDown(83)){ //s
-        playerY += speed;
-        image(spriteFront, playerX, playerY, spriteWidth, spriteHeight);
-        spritePosition = "back";
-      }
-    }
-  }
-}
-
 // -------------------- OBJECT CREATION --------------------- //
 
 function createObject() {
   thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene-one");
     
-  theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "menu");
-  theExitButton = new Button (width/3.5, height/2, exitButton, hoverExit, "test");
-  
-  sceneOneText1 = new Text(width/15, height/2, "Test 1");
-  sceneOneText2 = new Text(width/15, height/2.5, "Test 2");
-  sceneOneText3 = new Text(width/15, height/2.5, "Test 3");
+  theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "start");
 
   theCardRock = new Card(50, height/2.5, cardRock, "rps-choseRock");
   theCardPaper = new Card(300, height/2.5, cardPaper, "rps-choseRock");
@@ -421,28 +372,167 @@ function createObject() {
 
   theKeybind = new Button(width/3.5, height/1.5, 350, 150, keybind, hoverKeybind, "rps-howToPlayMenu");
 
-  theObstacle = new Obstacle();
-  thePlayer = new Sprite(width/4, height+30, 100, 100, spriteFront);
-
   theEscStartButton = new Button(width/3.5, height/2, 350, 150, escStartButton, hoverEscStartButton, "esc-play");
-
-  boxEmpty = new Text(width/1.4, height/2.5, "An empty box.");
-  boxItem = new Text(width/1.4, height/2.5, "There is something in this box. Open?");
-
-  escYes = new OtherText(width/1.4, height/2.5, "white", 30, "[1] Yes");
-  escNo = new OtherText(width/1.2, height/2.5, "white", 30, "[2] No" );
 }
 // ----------------------- TEXT STATE ---------------------- //
 
-    
+function mousePressed() {
+  if (state === "scene-one") {
+    state = "scene-one-choice";
+  }
+}
+
+function displayText() {
+  if (state === "scene-one") {
+    let dialogueOne = "You walk out of your house one fine#sunday afternoon looking for a dollar to#get your chocolate bar. Suddenly, a kid#approachesyou and asks#to play rock paper scissors#with him. Do you accept?#[1] yes#[2] no";
+    let a = split(dialogueOne, "#");
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    // split text - dialogue 1
+    text(a[0], width/10, height/3);
+    text(a[1], width/10, height/3+30);
+    text(a[2], width/10, height/3+60);
+    text(a[3], width/10, height/3+90);
+    text(a[4], width/10, height/3+120);
+    text(a[5], width/10, height/3+150);
+
+    // choices
+    text(a[6], width/10, height/3+250);
+    text(a[7], width/2, height/3+250);
+  }
+  else if (state === "scene-one-other") {
+    let dialogueOneOther = "You decided it was not worth it.#(Press Enter)";
+    let aother = split(dialogueOneOther, "#");
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(aother[0], width/10, height/3);
+    text(aother[1], width/10, height/3+30);
+  }
+  else if (state === "scene-two") {
+    let dialogueTwo = "#Unfortunately, he has no money.#So, you turn over and see a woman.#She says she'll#give you money if you go to#her house.#Do you accept?#[1] yes#[2] no";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/10, height/3);
+    text(b[1], width/10, height/3+30);
+    text(b[2], width/10, height/3+60);
+    text(b[3], width/10, height/3+90);
+    text(b[4], width/10, height/3+120);
+    text(b[5], width/10, height/3+150);
+
+    text(b[6], width/10, height/3+180);
+    text(b[7], width/10, height/3+280);
+    text(b[8], width/2, height/3+280);
+  }
+  else if (state === "scene-two-pt2") {
+    let dialogueTwoPt2 = "You got kidnapped. She had no dollar.#(Press Enter)";
+    let btwo = split(dialogueTwoPt2, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(btwo[0], width/10, height/3);
+    text(btwo[1], width/10, height/3+30);
+  }
+  else if (state === "scene-two-other") {
+    let dialogueTwo = "The woman seemed... kinda creepy.#You'd rather stay away.#(Press Enter)";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/10, height/3);
+    text(b[1], width/10, height/3+30);
+    text(b[2], width/10, height/3+60);
+  }
+  else if (state === "scene-three") {
+    let dialogueTwo = "You walk underneath#a building. A woman has dropped her vases.#Try to dodge?#[1] yes#[2] no";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/10, height/3);
+    text(b[1], width/10, height/3+30);
+    text(b[2], width/10, height/3+60);
+    text(b[3], width/10, height/3+160);
+    text(b[4], width/2, height/3+160);
+  }
+  else if (state === "scene-three-other") {
+    let dialogueTwo = "Many vases hit your head.# You may have a concussion.#(Press Enter)";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/10, height/3);
+    text(b[1], width/10, height/3+30);
+    text(b[2], width/10, height/3+60);
+  }
+  else if (state === "scene-four") {
+    let dialogueTwo = "That was eventful.#[1] yeah.";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/10, height/3);
+    text(b[1], width/10, height/3+30);
+  }
+  else if (state === "true-end") {
+    let dialogueTwo = "TRUE END#Unfortunately, the woman did#not have a dollar either.#But you found a dollar on#the street nearby!#THE END";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/2.5, height/4);
+    text(b[1], width/4, height/3+30);
+    text(b[2], width/4, height/3+60);
+    text(b[3], width/4, height/3+90);
+    text(b[4], width/4, height/3+120);
+    text(b[5], width/2.5, height/3+200);
+  }
+  else if (state === "bad-end") {
+    let dialogueTwo = "BAD END#Unfortunately, the woman did#not have a dollar either.#You Are deeply saddened.#THE END";
+    let b = split(dialogueTwo, "#");
+
+    textFont(font);
+    textSize(23);
+    fill("white");
+
+    text(b[0], width/2.5, height/4);
+    text(b[1], width/4, height/3+30);
+    text(b[2], width/4, height/3+60);
+    text(b[3], width/4, height/3+90);
+    text(b[4], width/2.5, height/3+200);
+  }
+}
+
 ////////////// Press Buttons ///////////////
         
 function pressButtons() {
   if (keyIsDown(13) && state === "rps-pressEnter") {
     state = "rps-play";
   }
-  else if (keyIsDown(13) && state === "scene-one") {
-    state = "rps-start";
+  else if (keyIsDown(49) && state === "scene-one") {
+    state = "rps-play";
+  }
+  else if (keyIsDown(50) && state === "scene-one") {
+    state = "scene-one-other";
   }
   else if (keyIsDown(27) && (state === "rps-youLose" || state === "rps-youWin")) {
     state = "rps-wonlost";
@@ -450,27 +540,49 @@ function pressButtons() {
   else if (keyIsDown(13) && (state === "rps-choseRock" || state === "rps-chosePaper" || state === "rps-choseScissors")) {
     state = "rps-results";
   }
-  else if (keyIsDown(13) && state === "rps-won") {
+  else if (keyIsDown(13) && state === "scene-one-other") {
     state = "scene-two";
   }
-  else if (keyIsDown(13) && state === "rps-lost") {
-    state = "scene-two";
+  else if (keyIsDown(49) && state === "scene-two") {
+    state = "scene-two-pt2";
   }
-  else if (keyIsDown(13) && state === "scene-two") {
-    state = "esc-start";
+  else if (keyIsDown(13) && state === "scene-two-pt2") {
+    state = "esc-play";
   }
-  else if (keyIsDown(13) && state === "esc-you-win") {
-    // state back to start
-    state = "scene-3";
-    
-    // restore
-    hasFood = "no";
-    isFed = "not-fed";
-    hasKey = "no";
+  else if (keyIsDown(50) && state === "scene-two") {
+    state = "scene-two-other";
+  }
+  else if (keyIsDown(13) && state === "scene-two-other") {
+    state = "scene-three";
+  }
+  else if (keyIsDown(27) && state === "esc-you-win") {
+    state = "scene-three";
+    trueEnd++;
+  }
+  else if (keyIsDown(49) && state === "scene-three") {
+    state = "avoid-start";
+  }
+  else if (keyIsDown(50) && state === "scene-three") {
+    state = "scene-three-other";
+  }
+  else if (keyIsDown(13) && state === "scene-three-other") {
+    state = "scene-four";
+  }
+  else if (keyIsDown(49) && state === "scene-four") {
+    if (trueEnd < badEnd) {
+      state = "bad-end";
+    }
+    else if (trueEnd > badEnd) {
+      state = "true-end";
+    }
+    else if (trueEnd === badEnd) {
+      state = "bad-end";
+    }
+  }
+  else if (keyIsDown(27) && (state === "true-end" || state === "bad-end")) {
+    state = "start";
   }
 }
-
-
 
 /////////////// Game State //////////////////////////////
         
@@ -480,27 +592,26 @@ function gameState() {
     image(gameTitle, width/3.5, 200, 350, 200);
     thePlayButton.hoverClick();
   }
-  else if (state === "menu") {
-    background(50);
-    theExitButton.hoverClick();
-  }
   // TEMPORARY GAME STATE F0R TESTING
   else if (state === "test") {
     background(80);
+    //////////////////////////
   }
+  //--- Scene One Gamestate --- //
   else if (state === "scene-one") {
-    background("blue");
+    background(bgScene);
     theMenu.hoverClick();
+    displayText();
     pressButtons();
   }
-  // --- Rock Paper Scissors Minigame Gamestate --- // 
-
-  if (state === "rps-start") {
-    rpsWonOrLost();
-    restoreResult();
-    rpsPlayButton.hoverClick();
-    image(rpsStartTitle, width/4.3, height/4, 400, 200);
+  else if (state === "scene-one-other") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
+    badEnd++;
   }
+  // --- Rock Paper Scissors Minigame Gamestate --- // 
   else if (state === "rps-pressEnter") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressButtons();
@@ -550,117 +661,148 @@ function gameState() {
   else if (state === "rps-wonlost") {
     rpsWonOrLost();
   }
-  else if (state === "rps-lost") {
-    background("red");
-    pressButtons();
-  }
-  else if (state === "rps-won") {
-    background(105);
-    pressButtons();
-  }
+  // --- Scene Two --- //
   else if (state === "scene-two") {
-    background("yellow");
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
     pressButtons();
+  }
+  else if (state === "scene-two-pt2") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
+  }
+  else if (state === "scene-two-other") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
+    badEnd++;
   }
   // --- Escape Room Minigame Gamestate --- // 
 
-  // start screen 
-  if (state === "esc-start") {
+  // state - start screen 
+  else if (state === "esc-start") {
     background(100);
     image(escTitle, width/3.5, 200, 350, 200);
     theEscStartButton.hoverClick();
   }
   // state - walking around room
-  if (state === "esc-play") {
+  else if (state === "esc-play") {
     displayGrid();
     characterMovement();
     overBorder();
     interactFurniture();
   }
   // state - check if you got item already or not
-  if (state === "esc-box-item") {
+  else if (state === "esc-box-item") {
     displayGrid();
     exitText();
     boxHasItem();
   }
   // state - ask if you want to pick up food
-  if (state === "esc-food-get") {
+  else if (state === "esc-food-get") {
     displayGrid();
-    boxItem.display();
-    escYes.display();
-    escNo.display();
+    image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     foodGet();
   }
   // state - food acquired
-  if (state === "esc-food-pickup") {
+  else if (state === "esc-food-pickup") {
     displayGrid();
     image(textGetItemFood, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
   // state - check if you fed the hamster yet or not
-  if (state === "esc-cage") {
+  else if (state === "esc-cage") {
     displayGrid();
     cageInteraction();
   }
   // state - ask to feed hamster
-  if (state === "esc-feed-hamster") {
+  else if (state === "esc-feed-hamster") {
     displayGrid();
     image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     feedHamsterInteraction();
   }
   // state - key acquired
-  if (state === "esc-key-pickup") {
+  else if (state === "esc-key-pickup") {
     displayGrid();
     image(textGetItemKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
   // state - ask to use key
-  if (state === "esc-key-has") {
+  else if (state === "esc-key-has") {
     displayGrid();
     image(textDoorHasKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     useKey();
   }
   // state - empty box dialogue
-  if (state === "esc-box-none") {
+  else if (state === "esc-box-none") {
     displayGrid();
     exitText();
     image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
   // state - plant dialogue
-  if (state === "esc-plant") {
+  else if (state === "esc-plant") {
     displayGrid();
     exitText();
     image(textPlant, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
   // state - chest dialogue
-  if (state === "esc-chest") {
+  else if (state === "esc-chest") {
     displayGrid();
     exitText();
     image(textChest, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
   // state - check to see if you have key to door
-  if (state === "esc-door") {
+  else if (state === "esc-door") {
     displayGrid();
     exitText();
     doorInteraction();
   }
-  // state - you escaped!
-  if (state === "esc-you-win") {
+  else if (state === "esc-you-win") {
     background(119, 65, 65);
-    image(escYouWin, width/4, height/4, 400, 200);
-    image(pressEnter, width/4, height/1.8, 400, 200);
+    image(youEscaped, width/4, height/4, 400, 200);
     pressButtons();
   }
-  if (state === "scene-3") {
-    background("blue");
+  else if (state === "scene-three") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
+  }
+  else if (state === "scene-three-other") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
   }
   // --- Avoid Falling Objects MiniGame Gamestate --- //
   else if (state === "avoid-start") {
     background(107);
-    theObstacle.display();
-    theObstacle.update();
-    thePlayer.display();
-    thePlayer.update();
+    catchObject();
+    catchPlayer();
+    overSide();
+    healthCount();
+    scoreCount();
+    checkScore();
+  }
+  else if (state === "scene-four") {
+    background(bgScene);
+    theMenu.hoverClick();
+    displayText();
+    pressButtons();
+  }
+  else if (state === "true-end") {
+    background(bgScene);
+    displayText();
+    pressButtons();
+  }
+  else if (state === "bad-end") {
+    background(bgScene);
+    displayText();
+    pressButtons();
   }
 }
 
@@ -672,12 +814,12 @@ function restoreResult() {
 
 function randomResult() {
   if (state === "rps-results") {
-    result = random(result);
-    if (result === "win") {
+    theResult = random(result);
+    if (theResult === "win") {
       state = "rps-youWin";
       yourScore = yourScore+1;
     }
-    if (result === "lose") {
+    if (theResult === "lose") {
       state = "rps-youLose";
       theirScore = theirScore+1;
     }
@@ -701,18 +843,16 @@ function theirWinCount() {
 function rpsWonOrLost() {
   if (yourScore === 3) {
     state = "scene-two";
+    trueEnd++;
   }
   else if (theirScore === 3) {
     state = "scene-two";
+    badEnd++;
   }
   else {
-    state = "rps-start";
+    state = "rps-play";
   }
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//------------------------------------------------------------------------------------------------------------------------
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // ----- Escape Room Minigame -------- //
 
@@ -728,6 +868,12 @@ function escroomSetup() {
   // sprite setup
   spriteWidth = 100;
   spriteHeight = 100;
+
+  // text box setup
+  xTextBox = width/7;
+  yTextBox = height/4;
+  textBoxWidth = width/1.4;
+  textBoxHeight = height/2.2;
 }
 
 ////////////////// display functions /////////////////////////////////
@@ -849,10 +995,6 @@ function overBorder() {
   }
 }
 
-function hitWall(newX, newY) {
-  
-}
-
 
 ////////////////////////// Character interaction /////////////////////////////////////////
 
@@ -954,7 +1096,7 @@ function exitText() {
 function foodGet() {
   if (keyIsDown(49)){
     state = "esc-food-pickup";
-    hasFood = "esc-yes";
+    hasFood = "yes";
   }
   else if (keyIsDown(50)){
     state = "esc-play";
@@ -987,6 +1129,7 @@ function boxHasItem() {
 function useKey() {
   if (keyIsDown(49)){
     state = "esc-you-win";
+    trueEnd++;
   }
   else if (keyIsDown(50)){
     state = "esc-play";
@@ -1017,4 +1160,82 @@ function doorInteraction() {
     image(textDoorNoKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
+}
+
+// --------------------- Catch the falling objects minigame ----------------------------------------- //
+
+function catchObjectsSetup() {
+  // player setup
+  playerCatchX = width/4;
+  playerCatchY = height/1.2;
+  playerSpeed = 5;
+
+  // falling object setup
+  objectX = random(0, width);
+  objectY = -100;
+  objectWidth = 350;
+  objectHeight = 350;
+  objectSpeed = 8;
+}
+
+function catchObject() {
+  if (objectY+objectHeight>height && objectX>playerCatchX && objectX<playerCatchX+100) {
+    updateXPosition();
+    objectY = -300;
+    objectSpeed += 0.5;
+    health--;
+  }
+  else if (objectY+objectHeight > height) {
+    objectY = -300;
+    catchScore++;
+    updateXPosition();
+  }
+  objectY += objectSpeed;
+  image(vase, objectX, objectY, objectWidth, objectHeight);
+}
+
+function checkScore() {
+  if (catchScore === 8) {
+    state = "scene-four";
+  }
+  else if (health === 0) {
+    state = "scene-four";
+  }
+}
+
+function catchPlayer() {
+  if (keyIsDown(65)){ //a
+    playerCatchX -= playerSpeed;
+  }
+  else if (keyIsDown(68)){ //d
+    playerCatchX += playerSpeed;
+  }
+  image(spriteFront, playerCatchX, playerCatchY, 400, 400);
+}
+
+function overSide() {
+  if (playerCatchX+100<0) {
+    playerCatchX = playerCatchX + playerSpeed;
+  }
+  else if (playerCatchX+200>width-100) {
+    playerCatchX = playerCatchX - playerSpeed;
+  }
+}
+
+function updateXPosition() {
+  objectX = random(0, width-objectWidth);
+}
+
+function healthCount() {
+  fill("CDBFBF");
+  textFont(font);
+  textSize(20);
+  text("Health: " + health, 20, 60);
+}
+
+function scoreCount() {
+  fill("CDBFBF");
+  textFont(font);
+  textSize(20);
+  text("Score: " + catchScore, width-150, 60);
 }
