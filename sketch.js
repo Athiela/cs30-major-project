@@ -2,12 +2,12 @@
 // Athiela A. 
 // Date
 
-/////////////////// Global variables ////////////////////////////////////
+//////////////////////// Global variables ////////////////////////////////////
 
 // ---------------- General Game variables --------------------------------//
 
 // state 
-let state = "scene-two-pt2";
+let state = "start";
 
 let font;
 let bgScene;
@@ -358,8 +358,6 @@ class Card {
 
 function createObject() {
   thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene-one");
-    
-  theMenu = new Button(15, 30, 80, 80, menuButton, menuButton, "start");
 
   theCardRock = new Card(50, height/2.5, cardRock, "rps-choseRock");
   theCardPaper = new Card(300, height/2.5, cardPaper, "rps-choseRock");
@@ -367,12 +365,6 @@ function createObject() {
 
   rpsPlayButton = new Button(width/3.5, height/2, 350, 150, rpsPlayButton, rpsHoverPlayButton, "rps-pressEnter");
   rpsHowToPlayButton = new Button(width/3.5, height/1.5, 350, 150, rpsHowToPlayButton, rpsHoverHowToPlay, "rps-howToPlayMenu");
-
-  rpsExitMenu = new Button(width/20, height/12, width/15, height/10, "rps-start");
-
-  theKeybind = new Button(width/3.5, height/1.5, 350, 150, keybind, hoverKeybind, "rps-howToPlayMenu");
-
-  theEscStartButton = new Button(width/3.5, height/2, 350, 150, escStartButton, hoverEscStartButton, "esc-play");
 }
 // ----------------------- TEXT STATE ---------------------- //
 
@@ -522,17 +514,22 @@ function displayText() {
   }
 }
 
-////////////// Press Buttons ///////////////
+// ------------------------------ Press Buttons -------------------------------//
         
 function pressButtons() {
-  if (keyIsDown(13) && state === "rps-pressEnter") {
+  // scene one
+  if (keyIsDown(49) && state === "scene-one") {
     state = "rps-play";
   }
-  else if (keyIsDown(49) && state === "scene-one") {
-    state = "rps-play";
+  else if (keyIsDown(13) && state === "scene-one-other") {
+    state = "scene-two";
   }
   else if (keyIsDown(50) && state === "scene-one") {
     state = "scene-one-other";
+  }
+  // rps
+  else if (keyIsDown(13) && state === "rps-pressEnter") {
+    state = "rps-play";
   }
   else if (keyIsDown(27) && (state === "rps-youLose" || state === "rps-youWin")) {
     state = "rps-wonlost";
@@ -540,14 +537,9 @@ function pressButtons() {
   else if (keyIsDown(13) && (state === "rps-choseRock" || state === "rps-chosePaper" || state === "rps-choseScissors")) {
     state = "rps-results";
   }
-  else if (keyIsDown(13) && state === "scene-one-other") {
-    state = "scene-two";
-  }
+  // scene two
   else if (keyIsDown(49) && state === "scene-two") {
     state = "scene-two-pt2";
-  }
-  else if (keyIsDown(13) && state === "scene-two-pt2") {
-    state = "esc-play";
   }
   else if (keyIsDown(50) && state === "scene-two") {
     state = "scene-two-other";
@@ -555,10 +547,15 @@ function pressButtons() {
   else if (keyIsDown(13) && state === "scene-two-other") {
     state = "scene-three";
   }
+  else if (keyIsDown(13) && state === "scene-two-pt2") {
+    state = "esc-play";
+  }
+  // esc room
   else if (keyIsDown(27) && state === "esc-you-win") {
     state = "scene-three";
     trueEnd++;
   }
+  // scene three
   else if (keyIsDown(49) && state === "scene-three") {
     state = "avoid-start";
   }
@@ -568,6 +565,7 @@ function pressButtons() {
   else if (keyIsDown(13) && state === "scene-three-other") {
     state = "scene-four";
   }
+  // scene four + endings
   else if (keyIsDown(49) && state === "scene-four") {
     if (trueEnd < badEnd) {
       state = "bad-end";
@@ -589,24 +587,18 @@ function pressButtons() {
 function gameState() {
   // --- Start Screen Gamestate --- // 
   if (state === "start") {
+    background(50);
     image(gameTitle, width/3.5, 200, 350, 200);
     thePlayButton.hoverClick();
-  }
-  // TEMPORARY GAME STATE F0R TESTING
-  else if (state === "test") {
-    background(80);
-    //////////////////////////
   }
   //--- Scene One Gamestate --- //
   else if (state === "scene-one") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
   else if (state === "scene-one-other") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
     badEnd++;
@@ -617,8 +609,8 @@ function gameState() {
     pressButtons();
   }
   else if (state === "rps-play") {
+    background(50);
     image(rpsOtherTitle, 250, 50, 300, 150);
-    theMenu.hoverClick();
     theCardRock.display();
     theCardRock.hoverClick();
 
@@ -647,12 +639,14 @@ function gameState() {
     randomResult();
   }
   else if (state === "rps-youWin") {
+    background(50);
     image(rpsYouWin, width/4, height/5, 350, 200);
     image(pressEsc, width/3.8, height/2.5, 350, 200);
     
     pressButtons();
   }
   else if (state === "rps-youLose") {
+    background(50);
     image(rpsYouLose, width/4, height/5, 350, 200);
     image(pressEsc, width/3.8, height/2.5, 350, 200);
 
@@ -664,19 +658,16 @@ function gameState() {
   // --- Scene Two --- //
   else if (state === "scene-two") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
   else if (state === "scene-two-pt2") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
   else if (state === "scene-two-other") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
     badEnd++;
@@ -689,43 +680,43 @@ function gameState() {
     image(escTitle, width/3.5, 200, 350, 200);
     theEscStartButton.hoverClick();
   }
-  // state - walking around room
+  // --- state - walking around room --- //
   else if (state === "esc-play") {
     displayGrid();
     characterMovement();
     overBorder();
     interactFurniture();
   }
-  // state - check if you got item already or not
+  // --- state - check if you got item already or not --- //
   else if (state === "esc-box-item") {
     displayGrid();
     exitText();
     boxHasItem();
   }
-  // state - ask if you want to pick up food
+  // --- state - ask if you want to pick up food --- //
   else if (state === "esc-food-get") {
     displayGrid();
     image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     foodGet();
   }
-  // state - food acquired
+  // --- state - food acquired --- //
   else if (state === "esc-food-pickup") {
     displayGrid();
     image(textGetItemFood, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
-  // state - check if you fed the hamster yet or not
+  // --- state - check if you fed the hamster yet or not --- //
   else if (state === "esc-cage") {
     displayGrid();
     cageInteraction();
   }
-  // state - ask to feed hamster
+  // --- state - ask to feed hamster --- //
   else if (state === "esc-feed-hamster") {
     displayGrid();
     image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     feedHamsterInteraction();
   }
-  // state - key acquired
+  // --- state - key acquired --- //
   else if (state === "esc-key-pickup") {
     displayGrid();
     image(textGetItemKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
@@ -768,13 +759,11 @@ function gameState() {
   }
   else if (state === "scene-three") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
   else if (state === "scene-three-other") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
@@ -790,7 +779,6 @@ function gameState() {
   }
   else if (state === "scene-four") {
     background(bgScene);
-    theMenu.hoverClick();
     displayText();
     pressButtons();
   }
@@ -827,16 +815,16 @@ function randomResult() {
 }
 
 function yourWinCount() {
+  fill("e53835");
   textFont(font);
   textSize(23);
-  fill("e53835");
   text("Win: " + yourScore, 30, height-10);
 }
 
 function theirWinCount() {
+  fill("e53835");
   textFont(font);
   textSize(23);
-  fill("e53835");
   text("Win: " + theirScore, width-120, height-10);
 }
 

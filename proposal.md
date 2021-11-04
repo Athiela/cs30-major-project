@@ -7,9 +7,6 @@ An adventure rpg/visual novel with different minigames sprinkled throughout alon
 **Rock Paper Scissors**
 - Way to keep track of score
 
-**Escape Room**
-- Let objects for interaction be at different places in the room instead of just on the sides
-
 **Avoid The Falling Objects**
 - Score (win after achieving a certain score)
 - Health (lose when health is at zero)
