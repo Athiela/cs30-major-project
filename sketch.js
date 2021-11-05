@@ -1,6 +1,6 @@
-// Adventure visual novel
+// Adventure visual novel (Chocolate Bar)
 // Athiela A. 
-// Date
+// Date: 04/11/2021
 
 //////////////////////// Global variables ////////////////////////////////////
 
@@ -125,10 +125,13 @@ let playButtonHover = false;
 let howToPlayButtonHover = false;
 let HowPlayMenu = false;
 
-// ---------------------- Catch Falling objects minigame ----------------------- //
+// ---------------------- avoid Falling objects minigame ----------------------- //
 
-let vase, playerCatchX, playerCatchY, objectX, objectY, objectWidth, objectHeight, objectSpeed, playerSpeed, newXPos;
-let catchScore = 0;
+// player and object variabes
+let vase, playeravoidX, playeravoidY, objectX, objectY, objectWidth, objectHeight, objectSpeed, playerSpeed, newXPos;
+
+// avoidscore and health
+let avoidScore = 0;
 let health = 4;
 let healthTally, scoreTally;
 
@@ -146,6 +149,7 @@ function preload() {
   playButton = loadImage("assets/playButton.png");
   hoverPlayButton = loadImage("assets/hoverPlayButton.png");
   bgScene = loadImage("assets/bgText.png");
+  music = loadSound("assets/music.mp4");
 
   //------------------- Menu Preload ----------------------- //
 
@@ -200,36 +204,34 @@ function preload() {
 
   //------- Rock Paper Scissors Minigame Preload -----------//
 
+  // title preload
   rpsStartTitle = loadImage("assets/startTitle.png");
   title = loadImage("assets/title.png");
-  rpsPlayButton = loadImage("assets/rpsPlayButton.png");
-  rpsHoverPlayButton = loadImage("assets/rpsHoverPlayButton.png");
-  howToPlayMenu = loadImage("assets/howPlayMenu.png");
-  exitMenu = loadImage("assets/exitMenuButton.png");
-  
   rpsOtherTitle = loadImage("assets/rpsOtherTitle.png");
+
+  // card preload
   cardRock = loadImage("assets/cardRock.png");
   cardPaper = loadImage("assets/cardPaper.png");
   cardScissors = loadImage("assets/cardScissors.png");
-
   cardFrame = loadImage("assets/cardFrame.png");
 
-  rpsHowToPlayButton = loadImage("assets/howToPlayButton.png");
-  rpsHoverHowToPlay = loadImage("assets/hoverHowToPlayButton.png");
-
+  // lose and win preload
   rpsYouLose = loadImage("assets/youLose.png");
   rpsYouWin = loadImage("assets/youWin.png");
 
+  // press text preload
   pressEnter = loadImage("assets/pressEnter.png");
-  areYouSureExit = loadImage("assets/areYouSureExit.png");
   otherPressEnter = loadImage("assets/otherPressEnter.png");
+  pressEsc = loadImage("assets/pressEscExit.png");
+
+  // chose preload
   youChoseRock = loadImage("assets/youChoseRock.png");
   youChosePaper = loadImage("assets/youChosePaper.png");
   youChoseScissors = loadImage("assets/youChoseScissors.png");
-  pressEsc = loadImage("assets/pressEscExit.png");
 
-  // -------------- Catch Minigame Preload --------------------- //
+  // -------------- avoid Minigame Preload --------------------- //
 
+  // vase image preload
   vase = loadImage("assets/vase.png");
 }
 ////////////////// Setup //////////////////////////////////////
@@ -238,7 +240,9 @@ function setup() {
   createCanvas(800, 800);
   createObject();
   escroomSetup();
-  catchObjectsSetup();
+  avoidObjectsSetup();
+
+  music.loop();
 }
 
 function draw() {
@@ -261,17 +265,19 @@ class Button {
     this.changeState = changeState;
   }
   hoverClick() {
-    if (this.checkIfInside(mouseX, mouseY)) {
-      image(this.theHoverImage, this.x, this.y, this.width, this.height);
+    if (this.checkIfInside(mouseX, mouseY)) { 
+      // hover
+      image(this.theHoverImage, this.x, this.y, this.width, this.height); 
       if (mouseIsPressed) {
         state = this.changeState;
       }
     }
     else {
+      // no hover
       image(this.theImage, this.x, this.y, this.width, this.height);
     }
   }
-  checkIfInside(x, y) {
+  checkIfInside(x, y) { // check if mouse inside
     return x>this.x && x<this.x + this.width &&
     y>this.y && y<this.y + this.height;
   }
@@ -357,22 +363,15 @@ class Card {
 // -------------------- OBJECT CREATION --------------------- //
 
 function createObject() {
+  // play button creation
   thePlayButton = new Button(width/3.5, height/2, 350, 150, playButton, hoverPlayButton, "scene-one");
 
+  // card creation
   theCardRock = new Card(50, height/2.5, cardRock, "rps-choseRock");
   theCardPaper = new Card(300, height/2.5, cardPaper, "rps-choseRock");
   theCardScissors = new Card(550, height/2.5, cardScissors, "rps-choseRock");
-
-  rpsPlayButton = new Button(width/3.5, height/2, 350, 150, rpsPlayButton, rpsHoverPlayButton, "rps-pressEnter");
-  rpsHowToPlayButton = new Button(width/3.5, height/1.5, 350, 150, rpsHowToPlayButton, rpsHoverHowToPlay, "rps-howToPlayMenu");
 }
 // ----------------------- TEXT STATE ---------------------- //
-
-function mousePressed() {
-  if (state === "scene-one") {
-    state = "scene-one-choice";
-  }
-}
 
 function displayText() {
   if (state === "scene-one") {
@@ -401,6 +400,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 1 (other)
     text(aother[0], width/10, height/3);
     text(aother[1], width/10, height/3+30);
   }
@@ -412,6 +412,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 2
     text(b[0], width/10, height/3);
     text(b[1], width/10, height/3+30);
     text(b[2], width/10, height/3+60);
@@ -431,6 +432,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 2 (pt2)
     text(btwo[0], width/10, height/3);
     text(btwo[1], width/10, height/3+30);
   }
@@ -442,6 +444,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 2 (other)
     text(b[0], width/10, height/3);
     text(b[1], width/10, height/3+30);
     text(b[2], width/10, height/3+60);
@@ -454,6 +457,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 3
     text(b[0], width/10, height/3);
     text(b[1], width/10, height/3+30);
     text(b[2], width/10, height/3+60);
@@ -468,6 +472,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 3 (other)
     text(b[0], width/10, height/3);
     text(b[1], width/10, height/3+30);
     text(b[2], width/10, height/3+60);
@@ -480,6 +485,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - dialogue 4
     text(b[0], width/10, height/3);
     text(b[1], width/10, height/3+30);
   }
@@ -491,6 +497,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - true end
     text(b[0], width/2.5, height/4);
     text(b[1], width/4, height/3+30);
     text(b[2], width/4, height/3+60);
@@ -506,6 +513,7 @@ function displayText() {
     textSize(23);
     fill("white");
 
+    // split text - bad end
     text(b[0], width/2.5, height/4);
     text(b[1], width/4, height/3+30);
     text(b[2], width/4, height/3+60);
@@ -586,17 +594,22 @@ function pressButtons() {
         
 function gameState() {
   // --- Start Screen Gamestate --- // 
+
   if (state === "start") {
     background(50);
     image(gameTitle, width/3.5, 200, 350, 200);
     thePlayButton.hoverClick();
   }
+
   //--- Scene One Gamestate --- //
+
+  // scene one dialogue
   else if (state === "scene-one") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // scene one dialogue (other)
   else if (state === "scene-one-other") {
     background(bgScene);
     displayText();
@@ -604,10 +617,13 @@ function gameState() {
     badEnd++;
   }
   // --- Rock Paper Scissors Minigame Gamestate --- // 
+
+  // press enter for next screen
   else if (state === "rps-pressEnter") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressButtons();
   }
+  // play rps
   else if (state === "rps-play") {
     background(50);
     image(rpsOtherTitle, 250, 50, 300, 150);
@@ -623,21 +639,26 @@ function gameState() {
     yourWinCount();
     theirWinCount();
   }
+  // chose rock
   else if (state === "rps-choseRock") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressButtons();
   }
+  // chose paper
   else if (state === "rps-chosePaper") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressButtons();
   }
+  // chose scissors
   else if (state === "rps-choseScissors") {
     image(otherPressEnter, width/4, height/3.5, width/2, height/2.5);
     pressButtons();
   }
+  // determine results
   else if (state === "rps-results") {
     randomResult();
   }
+  // won
   else if (state === "rps-youWin") {
     background(50);
     image(rpsYouWin, width/4, height/5, 350, 200);
@@ -645,6 +666,7 @@ function gameState() {
     
     pressButtons();
   }
+  // lost
   else if (state === "rps-youLose") {
     background(50);
     image(rpsYouLose, width/4, height/5, 350, 200);
@@ -652,20 +674,25 @@ function gameState() {
 
     pressButtons();
   }
+  // did win or lose?
   else if (state === "rps-wonlost") {
     rpsWonOrLost();
   }
   // --- Scene Two --- //
+
+  // scene two dialogue
   else if (state === "scene-two") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // scene two dialogue (pt2)
   else if (state === "scene-two-pt2") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // scene two (other)
   else if (state === "scene-two-other") {
     background(bgScene);
     displayText();
@@ -674,119 +701,132 @@ function gameState() {
   }
   // --- Escape Room Minigame Gamestate --- // 
 
-  // state - start screen 
+  // start screen 
   else if (state === "esc-start") {
     background(100);
     image(escTitle, width/3.5, 200, 350, 200);
     theEscStartButton.hoverClick();
   }
-  // --- state - walking around room --- //
+  // walking around room
   else if (state === "esc-play") {
     displayGrid();
     characterMovement();
     overBorder();
     interactFurniture();
   }
-  // --- state - check if you got item already or not --- //
+  // check if you got item already or not
   else if (state === "esc-box-item") {
     displayGrid();
     exitText();
     boxHasItem();
   }
-  // --- state - ask if you want to pick up food --- //
+  // ask if you want to pick up food
   else if (state === "esc-food-get") {
     displayGrid();
     image(textBoxItem, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     foodGet();
   }
-  // --- state - food acquired --- //
+  // food acquired
   else if (state === "esc-food-pickup") {
     displayGrid();
     image(textGetItemFood, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
-  // --- state - check if you fed the hamster yet or not --- //
+  // check if you fed the hamster yet or not
   else if (state === "esc-cage") {
     displayGrid();
     cageInteraction();
   }
-  // --- state - ask to feed hamster --- //
+  // ask to feed hamster
   else if (state === "esc-feed-hamster") {
     displayGrid();
     image(textFeedHamster, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     feedHamsterInteraction();
   }
-  // --- state - key acquired --- //
+  // key acquired
   else if (state === "esc-key-pickup") {
     displayGrid();
     image(textGetItemKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     exitText();
   }
-  // state - ask to use key
+  // ask to use key
   else if (state === "esc-key-has") {
     displayGrid();
     image(textDoorHasKey, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
     useKey();
   }
-  // state - empty box dialogue
+  // empty box dialogue
   else if (state === "esc-box-none") {
     displayGrid();
     exitText();
     image(textBoxEmpty, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
-  // state - plant dialogue
+  // plant dialogue
   else if (state === "esc-plant") {
     displayGrid();
     exitText();
     image(textPlant, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
-  // state - chest dialogue
+  // chest dialogue
   else if (state === "esc-chest") {
     displayGrid();
     exitText();
     image(textChest, xTextBox, yTextBox, textBoxWidth, textBoxHeight);
   }
-  // state - check to see if you have key to door
+  // check to see if you have key to door
   else if (state === "esc-door") {
     displayGrid();
     exitText();
     doorInteraction();
   }
+  // won escape room
   else if (state === "esc-you-win") {
     background(119, 65, 65);
     image(youEscaped, width/4, height/4, 400, 200);
     pressButtons();
   }
+
+  // --- Scene 3 Gamestate  --- //
+
+  // scene three dialogue
   else if (state === "scene-three") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // scene three dialogue (other)
   else if (state === "scene-three-other") {
     background(bgScene);
     displayText();
     pressButtons();
   }
   // --- Avoid Falling Objects MiniGame Gamestate --- //
+
+  // play avoid minigame
   else if (state === "avoid-start") {
     background(107);
-    catchObject();
-    catchPlayer();
+    avoidObject();
+    avoidPlayer();
     overSide();
     healthCount();
     scoreCount();
     checkScore();
   }
+  // --- Scene 4 Gamestate --- //
+
+  // scene four dialogue
   else if (state === "scene-four") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // true end dialogue
   else if (state === "true-end") {
     background(bgScene);
     displayText();
     pressButtons();
   }
+  // bad end dialogue
   else if (state === "bad-end") {
     background(bgScene);
     displayText();
@@ -1150,12 +1190,12 @@ function doorInteraction() {
   }
 }
 
-// --------------------- Catch the falling objects minigame ----------------------------------------- //
+// --------------------- Avoid the falling objects minigame ----------------------------------------- //
 
-function catchObjectsSetup() {
+function avoidObjectsSetup() {
   // player setup
-  playerCatchX = width/4;
-  playerCatchY = height/1.2;
+  playeravoidX = width/4;
+  playeravoidY = height/1.2;
   playerSpeed = 5;
 
   // falling object setup
@@ -1166,54 +1206,63 @@ function catchObjectsSetup() {
   objectSpeed = 8;
 }
 
-function catchObject() {
-  if (objectY+objectHeight>height && objectX>playerCatchX && objectX<playerCatchX+100) {
+function avoidObject() {
+  // if collide
+  if (objectY+objectHeight>height && objectX>playeravoidX && objectX<playeravoidX+100) {
     updateXPosition();
     objectY = -300;
     objectSpeed += 0.5;
     health--;
   }
+  // avoided
   else if (objectY+objectHeight > height) {
     objectY = -300;
-    catchScore++;
+    avoidScore++;
     updateXPosition();
   }
+  // move vase
   objectY += objectSpeed;
   image(vase, objectX, objectY, objectWidth, objectHeight);
 }
 
 function checkScore() {
-  if (catchScore === 8) {
+  // won
+  if (avoidScore === 8) {
     state = "scene-four";
   }
+  // lost
   else if (health === 0) {
     state = "scene-four";
   }
 }
 
-function catchPlayer() {
+function avoidPlayer() {
   if (keyIsDown(65)){ //a
-    playerCatchX -= playerSpeed;
+    playeravoidX -= playerSpeed;
   }
   else if (keyIsDown(68)){ //d
-    playerCatchX += playerSpeed;
+    playeravoidX += playerSpeed;
   }
-  image(spriteFront, playerCatchX, playerCatchY, 400, 400);
+  image(spriteFront, playeravoidX, playeravoidY, 400, 400);
 }
 
 function overSide() {
-  if (playerCatchX+100<0) {
-    playerCatchX = playerCatchX + playerSpeed;
+  // over left
+  if (playeravoidX+100<0) {
+    playeravoidX = playeravoidX + playerSpeed;
   }
-  else if (playerCatchX+200>width-100) {
-    playerCatchX = playerCatchX - playerSpeed;
+  // over right
+  else if (playeravoidX+200>width-100) {
+    playeravoidX = playeravoidX - playerSpeed;
   }
 }
 
+// update vase x for random
 function updateXPosition() {
   objectX = random(0, width-objectWidth);
 }
 
+// health
 function healthCount() {
   fill("CDBFBF");
   textFont(font);
@@ -1221,9 +1270,10 @@ function healthCount() {
   text("Health: " + health, 20, 60);
 }
 
+// score
 function scoreCount() {
   fill("CDBFBF");
   textFont(font);
   textSize(20);
-  text("Score: " + catchScore, width-150, 60);
+  text("Score: " + avoidScore, width-150, 60);
 }
